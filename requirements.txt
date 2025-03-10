@@ -4,3 +4,6 @@ mariadb==1.1.12
 python-dotenv==1.0.1
 Flask-WTF==1.2.2
 Flask-MySQLdb==2.0.0
+Flask-Bcrypt==1.0.1
+Flask-Login==0.6.3
+Flask-Migrate==4.1.0
