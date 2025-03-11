@@ -1,4 +1,4 @@
-from .application import db 
+from app.application import db, bcrypt 
 
 
 # Users table for storing user information
@@ -13,6 +13,24 @@ class User(db.Model):
 
     # One-to-many relationship: One user can have many user_medicines
     user_medicines = db.relationship('UserMedicine', backref='user', lazy=True)
+
+    def is_active(self):
+        return True  
+
+    def is_authenticated(self):
+        return True  
+
+    def is_anonymous(self):
+        return False  
+
+    def get_id(self):
+        return str(self.id)
+
+    def check_password(self, password):
+        return bcrypt.check_password_hash(self.password_hash, password)
+
+    def set_password(self, password):
+        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def __repr__(self):
         return f"<User {self.email}>"

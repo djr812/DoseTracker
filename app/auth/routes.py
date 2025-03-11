@@ -1,28 +1,45 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.application import db, bcrypt
-from flask_login import login_user, login_required
+from flask_login import login_user, login_required, current_user, logout_user
 from app.models import User
-from werkzeug.security import generate_password_hash, check_password_hash
+
 
 auth_bp = Blueprint('auth', __name__)
 
 # Login Route
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    # If the user is already logged in, redirect them to /my_medicine
+    if current_user.is_authenticated:
+        return redirect(url_for('medicines.my_medicine'))
+    
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+
+        # Find the user by email
         user = User.query.filter_by(email=email).first()
 
-        if user and check_password_hash(user.password_hash, password):
-            # Login the user and redirect to dashboard
-            flash('Login successful!', 'success')
-            return redirect(url_for('dashboard'))  
-        else:
-            flash('Invalid login credentials', 'danger')
-            return redirect(url_for('auth.login'))
+        if user and user.check_password(password):  
+            # Log the user in
+            login_user(user, remember=True)
 
-    return render_template('index.html')
+            # Redirect to the my_medicine page after successful login
+            return redirect(url_for('medicines.my_medicine'))
+
+        else:
+            flash('Invalid credentials, please try again', 'danger')
+
+    return render_template('index.html', page_class='index_page')
+
+
+# Logout Route
+@auth_bp.route('/logout')
+def logout():
+    logout_user()  
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('auth.login'))  
+
 
 # Sign up Route
 @auth_bp.route('/sign-up', methods=['GET', 'POST'])
@@ -61,4 +78,4 @@ def sign_up():
             flash(f'Error: {e}', 'error')
             return redirect(url_for('auth.sign_up'))
 
-    return render_template('sign_up.html')
+    return render_template('sign_up.html', page_class='sign_up_page')

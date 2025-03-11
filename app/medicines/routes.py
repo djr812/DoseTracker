@@ -1,17 +1,39 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import login_required, current_user
 from app.models import Medicine, UserMedicine
 from app.application import db
 
+
 # Define the blueprint for medicines routes
 medicines = Blueprint('medicines', __name__)
+
+
+@medicines.route('/api/medicines', methods=['GET'])
+@login_required
+def api_medicines():
+    user_medicines = UserMedicine.query.filter_by(user_id=current_user.id).all()
+    medicines = []
+    
+    # Fetch associated medicine names for each user_medicine entry
+    for user_medicine in user_medicines:
+        medicine = Medicine.query.get(user_medicine.medicine_id)
+        medicines.append({
+            'id': medicine.id,
+            'name': medicine.name,
+            'dosage': user_medicine.dosage,
+            'frequency': user_medicine.frequency,
+            'notes': user_medicine.notes
+        })
+    
+    return jsonify(medicines)
+
 
 # Route for adding a medicine
 @medicines.route('/add_medicine', methods=['GET', 'POST'])
 @login_required
 def add_medicine():
     if request.method == 'POST':
-        medicine_name = request.form.get('medicine_name')
+        medicine_name = request.form.get('name')
         dosage = request.form.get('dosage')
         frequency = request.form.get('frequency')
 
@@ -41,9 +63,64 @@ def add_medicine():
 
     return render_template('add_medicine.html')
 
+
 # Route for viewing the user's medicines
-@medicines.route('/my_medicines')
+@medicines.route('/my_medicine')
 @login_required
-def view_medicines():
+def my_medicine():
+    # Query medicines associated with the current user
     user_medicines = UserMedicine.query.filter_by(user_id=current_user.id).all()
-    return render_template('my_medicines.html', user_medicines=user_medicines)
+    medicines = []
+    
+    # Fetching associated medicine names for each user_medicine entry
+    for user_medicine in user_medicines:
+        medicine = Medicine.query.get(user_medicine.medicine_id)
+        medicines.append({
+            'id': medicine.id,
+            'name': medicine.name,
+            'dosage': user_medicine.dosage,
+            'frequency': user_medicine.frequency,
+            'notes': user_medicine.notes
+        })
+    
+    print(medicines)
+
+    return render_template('my_medicine.html', medicines=medicines, page_class='my_medicine_page')
+
+
+@medicines.route('/delete_medicine/<int:medicine_id>', methods=['DELETE'])
+@login_required
+def delete_medicine(medicine_id):
+    # Find the record from the user_medicines table
+    user_medicine = UserMedicine.query.filter_by(id=medicine_id, user_id=current_user.id).first()
+
+    if user_medicine:
+        db.session.delete(user_medicine)
+        db.session.commit()
+        return jsonify({'message': 'Medicine deleted successfully'}), 200
+    else:
+        return jsonify({'message': 'Medicine not found'}), 404
+
+
+@medicines.route('/medicines/edit_medicine/<int:medicine_id>', methods=['GET', 'POST'])
+def edit_medicine(medicine_id):
+    # Retrieve the medicine from the database based on its ID
+    medicine = Medicine.query.get_or_404(medicine_id)
+    
+    if request.method == 'POST':
+        # Get the updated details from the form
+        medicine.name = request.form['name']
+        medicine.dose = request.form['dose']
+        medicine.frequency = request.form['frequency']
+        medicine.notes = request.form['notes']
+        
+        # Save the updated medicine details to the database
+        try:
+            db.session.commit()
+            return redirect(url_for('my_medicines'))  # Redirect to a page showing all medicines
+        except Exception as e:
+            db.session.rollback()  # Rollback on error
+            return render_template('edit_medicine.html', medicine=medicine, error="Error updating medicine.")
+    
+    # If the method is GET, render the form with the existing medicine data
+    return render_template('edit_medicine.html', medicine=medicine)

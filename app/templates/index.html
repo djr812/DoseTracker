@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DoseTracker - Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
+{% extends 'layout.html' %}
+
+{% block content %}
     <div class="container">
         <!-- Logo and App Title -->
         <div class="logo-container">
@@ -15,7 +9,7 @@
         </div>
 
         <!-- Login Form -->
-        <form action="/login" method="POST" class="login-form">
+        <form action="{{ url_for('auth.login') }}" method="POST" class="login-form">
             <label for="email">Username (Email Address):</label>
             <input type="email" id="email" name="email" required>
 
@@ -31,6 +25,17 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-</body>
-</html>
+    <script>
+        document.querySelector('form').addEventListener('submit', function (event) {
+        // Prevent form submission if there are any issues (like empty fields)
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+    
+        if (!email || !password) {
+            event.preventDefault();
+            alert("Both fields are required.");
+        }
+    });
+    </script>  
+
+{% endblock %}
