@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 
+
 # Initialize extensions
 db = SQLAlchemy()
 migrate = Migrate()
@@ -31,15 +32,16 @@ def create_app():
         from .models import User  
         from .auth.routes import auth_bp  
         from .main.routes import main_bp
+        from .medicines.routes import medicines
 
     @login_manager.user_loader
     def load_user(user_id):
-        # This function loads the user from the database
         return User.query.get(int(user_id))
 
     # Register Blueprints 
     app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(main_bp)  
+    app.register_blueprint(main_bp) 
+    app.register_blueprint(medicines, url_prefix='/medicines') 
 
     return app
 

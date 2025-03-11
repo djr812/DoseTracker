@@ -107,6 +107,60 @@ button:hover {
     text-decoration: underline;
 }
 
+/*Sign Up Page */
+
+.sign-up-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f5f5f5; /* Off-white background */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sign-up-container h2 {
+    text-align: center;
+    color: #6c3f6e; /* Mauve */
+    font-size: 24px;
+}
+
+.sign-up-form .form-group-sign-up {
+    margin-bottom: 15px;
+}
+
+.sign-up-form .form-group-sign-up label {
+    display: block;
+    font-weight: bold;
+}
+
+.sign-up-form .form-group-sign-up input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.sign-up-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #6c3f6e; /* Mauve */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.sign-up-btn:hover {
+    background-color: #542a47;
+}
+
+.sign-up-link {
+    text-align: center;
+    font-size: 14px;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 375px) {
     .container {
@@ -124,5 +178,27 @@ button:hover {
 
     input, button {
         font-size: 14px;
+    }
+
+    .sign-up-container {
+        padding: 15px;
+        max-width: 90%; 
+    }
+
+    .sign-up-container h2 {
+        font-size: 22px; 
+    }
+
+    .sign-up-btn {
+        font-size: 14px; 
+    }
+
+    .sign-up-form .form-group-sign-up input {
+        font-size: 14px; 
+        padding: 10px;  
+    }
+
+    .sign-up-link {
+        font-size: 12px; 
     }
 }

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Medicines</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>My Medicines</h2>
+        {% if user_medicines %}
+            <ul>
+                {% for user_medicine in user_medicines %}
+                    <li>{{ user_medicine.medicine.name }} - Dosage: {{ user_medicine.dosage }} - Frequency: {{ user_medicine.frequency }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No medicines added yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

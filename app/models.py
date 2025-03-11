@@ -1,11 +1,49 @@
-
 from .application import db 
-from flask_login import UserMixin
 
-class User(db.Model, UserMixin):
+
+# Users table for storing user information
+class User(db.Model):
+    __tablename__ = 'users'
+
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    # One-to-many relationship: One user can have many user_medicines
+    user_medicines = db.relationship('UserMedicine', backref='user', lazy=True)
 
     def __repr__(self):
-        return f'<User {self.email}>'
+        return f"<User {self.email}>"
+
+# Medicines table to store the medicine information
+class Medicine(db.Model):
+    __tablename__ = 'medicines'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    # One-to-many relationship: One medicine can be associated with many user_medicines
+    user_medicines = db.relationship('UserMedicine', backref='medicine', lazy=True)
+
+    def __repr__(self):
+        return f"<Medicine {self.name}>"
+
+# User-Medicine table for storing user-specific data about medicines they are tracking
+class UserMedicine(db.Model):
+    __tablename__ = 'user_medicines'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    medicine_id = db.Column(db.Integer, db.ForeignKey('medicines.id'), nullable=False)
+    dosage = db.Column(db.String(255), nullable=False)
+    frequency = db.Column(db.String(255), nullable=False)
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    def __repr__(self):
+        return f"<UserMedicine User: {self.user_id}, Medicine: {self.medicine_id}>"
