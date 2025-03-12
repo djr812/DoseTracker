@@ -14,9 +14,17 @@
 
 <body class="{{ page_class }}">
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark d-flex justify-content-between w-100">
+            <!-- Move the title to the left side -->
             <a class="navbar-brand" href="{{ url_for('main.index') }}">DoseTracker</a>
-            <div class="collapse navbar-collapse">
+
+            <!-- Hamburger Icon for small screens, placed to the right -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Collapsible Navbar Content -->
+            <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     {% if current_user.is_authenticated %}
                     <li class="nav-item">
@@ -45,17 +53,14 @@
         {% endblock %}
     </div>
 
-     <footer class="bg-dark text-white text-center py-3 mt-4">
+    <footer class="bg-dark text-white text-center py-3 mt-4">
         <p>&copy; 2025 DoseTracker. All Rights Reserved.</p>
     </footer>
 
-    
-    
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    
 </body>
 
 </html>

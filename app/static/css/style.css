@@ -52,7 +52,6 @@ body {
     padding: 40px;
 }
 
-/* Style for the container holding the logo and app title */
 .logo-container {
     display: flex;  
     align-items: center;  
@@ -60,14 +59,12 @@ body {
     margin-bottom: 30px;  
 }
 
-/* Style for the logo image */
 .logo {
     height: 50px;  
     width: auto; 
     border-radius: 5px; 
 }
 
-/* Style for the app title */
 .app-title {
     font-size: 36px;  
     font-weight: bold;  
@@ -75,13 +72,11 @@ body {
     margin: 0;  
 }
 
-/* Style for the login form */
 .login-form {
     margin-top: 30px;
     display: block;  
 }
 
-/* Style for each form input field */
 .login-form input {
     width: 100%;  
     padding: 10px;
@@ -91,7 +86,6 @@ body {
     font-size: 16px;  
 }
 
-/* Style for login button */
 .login-btn {
     width: 100%;  
     padding: 10px;
@@ -107,7 +101,6 @@ body {
     background-color: #7a3d74;
 }
 
-/* Style for the signup link */
 .signup-link {
     margin-top: 20px;
     text-align: center;
@@ -120,7 +113,6 @@ body {
 .signup-link a:hover {
     text-decoration: underline;
 }
-
 
 label {
     font-size: 14px;
@@ -223,7 +215,7 @@ button:hover {
     max-width: 1400px;
     margin: 0 auto;
     padding: 30px;
-    max-height: calc(100vh - 150px); /* Ensure the container doesn't fill the full screen height */
+    max-height: calc(100vh - 150px); 
 }
 
 #medicines-table {
@@ -277,6 +269,17 @@ button:hover {
 #add-medicine-btn:hover {
     background-color: #542a47;
     cursor: pointer;
+}
+
+.btn-link {
+    text-decoration: none;
+    font-size: 14px;
+    color: #6c3f6e;  
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+    color: #542a47;  /* Darker mauve on hover */
 }
 
 /* Edit and Delete Buttons */
@@ -342,23 +345,20 @@ button:hover {
 
 /* Mobile responsiveness */
 @media (max-width: 480px) {
-    /* Make logo smaller */
+    
     .logo {
         height: 40px;
     }
 
-    /* Decrease font size for app title */
     .app-title {
         font-size: 24px;
     }
 
-    /* Stack logo and app title vertically */
     .logo-container {
         flex-direction: column;
         align-items: center;
     }
 
-    /* Adjust the form fields */
     .login-form input {
         font-size: 14px;
         padding: 8px;
@@ -369,11 +369,33 @@ button:hover {
         padding: 8px;
     }
 
+    .navbar {
+        flex-wrap: nowrap; 
+        justify-content: space-between; 
+    }
+    .navbar-toggler {
+        margin-left: auto; 
+    }
+    .navbar-brand {
+        font-size: 18px; 
+    }
+
+    .navbar-collapse {
+        width: 100%;
+    }
+
+    .navbar-nav {
+        text-align: center; 
+    }
+
+    .nav-item {
+        padding: 10px; 
+    }
+
     .signup-link a {
         font-size: 12px;
     }
 
-    /* Adjust the table for smaller screens */
     #medicines-table {
         font-size: 12px; 
     }
@@ -386,7 +408,6 @@ button:hover {
         font-size: 14px;
     }
 
-    /* Stack the action buttons vertically */
     .action-buttons {
         flex-direction: column;
         gap: 5px; 
@@ -400,14 +421,13 @@ button:hover {
         text-align: center;       
     }
 
-    /* Adjust the container widths */
     .container {
         width: 100%;
         padding: 10px;
     }
 
     .table-container {
-        max-height: 350px;  /* Reduce the height */
+        max-height: 350px;  
         overflow-y: auto;   /* Allow scrolling if needed */
     }
 

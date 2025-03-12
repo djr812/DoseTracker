@@ -25,9 +25,14 @@
                 <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary">Add Medicine</button>
+            <div class="d-flex justify-content-between align-items-center">
+                <!-- Add Medicine Button -->
+                <button type="submit" class="btn btn-primary">Add Medicine</button>
+
+                <!-- Link to My Medicines Page -->
+                <a href="{{ url_for('medicines.my_medicine') }}" class="btn btn-link">Back to Medicines</a>
+            </div>
         </form>
     </div>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 {% endblock %}
 
