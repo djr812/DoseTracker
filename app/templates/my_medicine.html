@@ -1,29 +1,31 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-
-<div class="container">
+<div class="container mt-4">
     <h1>Your Medicines</h1>
     
     <!-- Table for displaying the medicines -->
-    <table id="medicines-table">
-        <thead id="medicines-thead">
-            <tr>
-                <th id="medicines-col-header">Name</th>
-                <th id="medicines-col-header">Dose</th>
-                <th id="medicines-col-header">Freq</th>
-                <th id="medicines-col-header">Notes</th>
-                <th id="medicines-col-header">Actions</th>
-            </tr>
-        </thead>
-        <tbody id="medicines-tbody">
-            <!-- Rows will be dynamically populated here by JavaScript -->
-        </tbody>
-    </table>
+    <div class="table-container">
+        <table id="medicines-table">
+            <thead id="medicines-thead">
+                <tr>
+                    <th id="medicines-col-header">Name</th>
+                    <th id="medicines-col-header">Dose</th>
+                    <th id="medicines-col-header">Freq</th>
+                    <th id="medicines-col-header">Notes</th>
+                    <th id="medicines-col-header">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="medicines-tbody">
+                <!-- Rows will be dynamically populated here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
 
     <!-- Button to add a new medicine -->
     <button class="btn btn-primary" id="add-medicine-btn" onclick="window.location.href='/medicines/add_medicine'">Add New Medicine</button>
 </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
     // Fetch medicines data from the API endpoint

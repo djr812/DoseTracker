@@ -85,8 +85,6 @@ def my_medicine():
             'notes': user_medicine.notes
         })
     
-    print(medicines)
-
     return render_template('my_medicine.html', medicines=medicines, page_class='my_medicine_page')
 
 

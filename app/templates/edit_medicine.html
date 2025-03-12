@@ -1,32 +1,50 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <h1>Edit Medicine</h1>
+    <div class="container">
+        <h2>Edit Medicine</h2>
 
-    {% if error %}
-        <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
 
-    <form action="{{ url_for('medicines.edit_medicine', medicine_id=medicine.id) }}" method="POST">
-        <label for="name">Name:</label>
-        <input type="text" name="name" value="{{ medicine.name }}" required><br><br>
+        <form action="{{ url_for('medicines.edit_medicine', medicine_id=medicine.id) }}" method="POST">
+            <!-- Name Field -->
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" name="name" value="{{ medicine.name }}" required>
+            </div>
 
-        <label for="dose">Dose:</label>
-        <input type="text" name="dosage" value="{{ user_medicine.dosage }}" required><br><br>
+            <!-- Dosage Field -->
+            <div class="form-group">
+                <label for="dosage">Dose:</label>
+                <input type="text" class="form-control" name="dosage" value="{{ user_medicine.dosage }}" required>
+            </div>
 
-        <label for="frequency">Frequency:</label>
-        <input type="text" name="frequency" value="{{ user_medicine.frequency }}" required><br><br>
+            <!-- Frequency Field -->
+            <div class="form-group">
+                <label for="frequency">Freq:</label>
+                <input type="text" class="form-control" name="frequency" value="{{ user_medicine.frequency }}" required>
+            </div>
 
-        <label for="notes">Notes:</label>
-        <textarea name="notes">{{ user_medicine.notes }}</textarea><br><br>
+            <!-- Notes Field -->
+            <div class="form-group">
+                <label for="notes">Notes:</label>
+                <textarea name="notes" class="form-control" rows="4" placeholder="Enter any additional notes here">{{ user_medicine.notes }}</textarea>
+            </div>
 
-        <button type="submit">Save Changes</button>
-    </form>
+            <!-- Buttons Row -->
+            <div class="form-group d-flex justify-content-between align-items-center">
+                <!-- Save Button -->
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                
+                <!-- Back to Medicines List Link -->
+                <a href="{{ url_for('medicines.my_medicine') }}" class="btn btn-link my-medicines-list">Back to Medicines List</a>
+            </div>
+        </form>
 
-    {% if error %}
-        <p style="color: red;">{{ error }}</p>
-    {% endif %}
-
-    <a href="{{ url_for('medicines.my_medicine') }}">Back to Medicines List</a>
-
+        {% if error %}
+            <p class="text-danger">{{ error }}</p>
+        {% endif %}
+    </div>
 {% endblock %}

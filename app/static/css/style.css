@@ -8,12 +8,12 @@
 /* Body Styling */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;  /* Off-white background */
+    background-color: #f0f0f0;  
     color: #333;
     display: flex;
-    flex-direction: column;  /* Stack elements vertically */
-    justify-content: space-between;  /* Push content to top and footer to bottom */
-    height: 100vh;  /* Ensure body fills entire viewport */
+    flex-direction: column;  
+    justify-content: space-between;  
+    height: 100vh;  
     margin: 0;
 }
 
@@ -24,7 +24,7 @@ body {
     color: white;
     text-align: center;
     position: sticky;
-    top: 0;  /* Stick navbar to top */
+    top: 0; 
     width: 100%;
 }
 
@@ -34,20 +34,15 @@ body {
     font-size: 24px;
 }
 
-/* Container Styling - Default */
+/* General Container Styling */
 .container {
-    width: 90%;               
-    max-width: 1200px;        
-    margin: 0 auto;           
-    padding: 20px;            
+    max-width: 1400px; 
+    margin: 0 auto;    
+    padding: 20px;
 }
 
-/* Specific Container Styling for Each Page */
-.my_medicine_page .container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px;
+.container.mt-4 {
+    margin-top: 0 !important;
 }
 
 .index_page .container {
@@ -90,22 +85,22 @@ body {
 .login-form input {
     width: 100%;  
     padding: 10px;
-    margin: 10px 0;  /* Add space between fields */
-    border: 1px solid #ccc;  /* Border color for input fields */
-    border-radius: 5px;  /* Rounded corners for input fields */
-    font-size: 16px;  /* Font size for input text */
+    margin: 10px 0;  
+    border: 1px solid #ccc;  
+    border-radius: 5px;  
+    font-size: 16px;  
 }
 
 /* Style for login button */
 .login-btn {
-    width: 100%;  /* Make the login button full width */
+    width: 100%;  
     padding: 10px;
     background-color: #9b4d96;
     color: white;
     border: none;
     cursor: pointer;
     font-size: 16px;
-    border-radius: 5px;  /* Rounded corners for button */
+    border-radius: 5px;  
 }
 
 .login-btn:hover {
@@ -215,37 +210,46 @@ button:hover {
     color: #6c3f6e;
 }
 
-/* General Container Styling */
-.container {
-    margin-top: 30px;
-    margin-bottom: 30px;
+/* Medicines Page Styling */
+.table-container {
+    max-height: 500px; 
+    overflow-y: auto; 
+    margin-bottom: 20px; 
+    width: 100%; 
 }
 
-/* Medicines Table Styling */
-#medicines-table {
+.my_medicine_page .container {
     width: 100%;
-    margin-top: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px;
+    max-height: calc(100vh - 150px); /* Ensure the container doesn't fill the full screen height */
+}
+
+#medicines-table {
+    width: 100%; 
     border-collapse: collapse;
-    font-size: 16px;
+    table-layout: auto; 
 }
 
 #medicines-table th, #medicines-table td {
-    padding: 12px 15px;
+    padding: 8px;
     text-align: left;
     border: 1px solid #ddd;
+    word-wrap: break-word;
 }
 
 #medicines-table th {
-    background-color: #f8f9fa; /* Light gray background */
+    background-color: #f8f9fa; 
     font-weight: bold;
 }
 
 #medicines-table tr:nth-child(even) {
-    background-color: #f9f9f9; /* Light background for alternating rows */
+    background-color: #f9f9f9; 
 }
 
 #medicines-table tr:hover {
-    background-color: #f1f1f1; /* Slight hover effect */
+    background-color: #f1f1f1; 
 }
 
 #medicines-col-header {
@@ -253,7 +257,6 @@ button:hover {
     letter-spacing: 1px;
 }
 
-/* Button Styling */
 #add-medicine-btn, .btn-primary, .btn-danger {
     font-size: 14px;
     padding: 10px 20px;
@@ -262,7 +265,7 @@ button:hover {
 }
 
 #add-medicine-btn {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 #add-medicine-btn {
@@ -314,6 +317,17 @@ button:hover {
     margin-top: 20px;
 }
 
+.my-medicines-list {
+    color: #9b4d96;  /* Mauve color */
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.my-medicines-list:hover {
+    color: #7a3c7e;  /* Darker mauve on hover */
+    text-decoration: underline;
+}
+
 
 /* Footer styles */
 .footer {
@@ -327,52 +341,86 @@ button:hover {
 }
 
 /* Mobile responsiveness */
-@media (max-width: 375px) {
+@media (max-width: 480px) {
+    /* Make logo smaller */
+    .logo {
+        height: 40px;
+    }
 
-    /* General container styling */
+    /* Decrease font size for app title */
+    .app-title {
+        font-size: 24px;
+    }
+
+    /* Stack logo and app title vertically */
+    .logo-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Adjust the form fields */
+    .login-form input {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .login-btn, .sign-up-btn {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .signup-link a {
+        font-size: 12px;
+    }
+
+    /* Adjust the table for smaller screens */
+    #medicines-table {
+        font-size: 12px; 
+    }
+
+    #medicines-table th, #medicines-table td {
+        padding: 6px; 
+    }
+
+    #medicines-table th {
+        font-size: 14px;
+    }
+
+    /* Stack the action buttons vertically */
+    .action-buttons {
+        flex-direction: column;
+        gap: 5px; 
+    }
+
+    .action-buttons .btn {
+        font-size: 10px;          
+        padding: 6px 12px;         
+        width: 60px;              
+        min-width: 20px;          
+        text-align: center;       
+    }
+
+    /* Adjust the container widths */
     .container {
-        width: 80%;
-        padding: 15px;
-        margin: 0;
-    }
-
-    /* Adjust page title for mobile */
-    .container h1 {
-        font-size: 22px;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    /* Medicine table container adjustments */
-    .medicine-table-container {
-        padding: 10px;
-        margin-bottom: 20px;
-    }
-
-    /* Button to add new medicine adjustments */
-    #add-medicine-btn {
         width: 100%;
-        padding: 12px 0;
-        font-size: 16px;
-        margin-top: 20px; /* Space above the button */
+        padding: 10px;
     }
 
-    /* Adjust navbar link font size */
-    .navbar a {
-        font-size: 18px;
+    .table-container {
+        max-height: 350px;  /* Reduce the height */
+        overflow-y: auto;   /* Allow scrolling if needed */
     }
 
-    /* Adjust padding for general containers */
-    .login-container {
-        padding: 20px;
-        width: 90%;
+    .my_medicine_page .container {
+        padding: 5px;
     }
 
-    button {
-        padding: 8px 15px;
+    .sign-up-container {
+        width: 100%;
+        padding: 15px;
     }
 
-    /* Add responsive behavior to the buttons */
+    /* Footer padding */
     .footer {
         padding: 10px;
     }
