@@ -102,25 +102,38 @@ def delete_medicine(medicine_id):
         return jsonify({'message': 'Medicine not found'}), 404
 
 
-@medicines.route('/medicines/edit_medicine/<int:medicine_id>', methods=['GET', 'POST'])
+@medicines.route('/edit_medicine/<int:medicine_id>', methods=['GET', 'POST'])
 def edit_medicine(medicine_id):
-    # Retrieve the medicine from the database based on its ID
-    medicine = Medicine.query.get_or_404(medicine_id)
+    try:
+        # Retrieve the medicine from the database based on its ID
+        medicine = Medicine.query.get_or_404(medicine_id)
+    except Exception as e:
+        # Log the error if medicine is not found
+        print(f"Error retrieving medicine with ID {medicine_id}: {e}")
+        return "Error: Medicine not found", 404
     
+    user_medicine = UserMedicine.query.filter_by(medicine_id=medicine_id).first()
+
+    if user_medicine is None:
+        # Handle the case where the user doesn't have a UserMedicine entry
+        return render_template('edit_medicine.html', error="Medicine data not found.")
+
     if request.method == 'POST':
         # Get the updated details from the form
         medicine.name = request.form['name']
-        medicine.dose = request.form['dose']
-        medicine.frequency = request.form['frequency']
-        medicine.notes = request.form['notes']
+        user_medicine.dosage = request.form['dosage']
+        user_medicine.frequency = request.form['frequency']
+        user_medicine.notes = request.form['notes']
         
         # Save the updated medicine details to the database
         try:
             db.session.commit()
-            return redirect(url_for('my_medicines'))  # Redirect to a page showing all medicines
+            return redirect(url_for('medicines.my_medicine'))  # Redirect to a page showing all medicines
         except Exception as e:
             db.session.rollback()  # Rollback on error
-            return render_template('edit_medicine.html', medicine=medicine, error="Error updating medicine.")
-    
+            print(f"Error during commit: {e}")
+            return render_template('edit_medicine.html', medicine=medicine, user_medicine=user_medicine, error="Error updating medicine.")
+
+
     # If the method is GET, render the form with the existing medicine data
-    return render_template('edit_medicine.html', medicine=medicine)
+    return render_template('edit_medicine.html', medicine=medicine, user_medicine=user_medicine)
