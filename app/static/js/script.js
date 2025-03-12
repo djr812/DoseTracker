@@ -29,22 +29,22 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         console.error("Medicines data is not in the expected format or is missing");
     }
-
-    // Function to handle deleting a medicine
-    function deleteMedicine(medicineId) {
-        if (confirm("Are you sure you want to delete this medicine?")) {
-            fetch(`/delete_medicine/${medicineId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }).then(response => {
-                if (response.ok) {
-                    location.reload();  // Reload the page to reflect the changes
-                } else {
-                    alert('Failed to delete medicine');
-                }
-            });
-        }
-    }
 });
+
+// Function to handle deleting a medicine
+function deleteMedicine(medicineId) {
+    if (confirm("Are you sure you want to delete this medicine?")) {
+        fetch(`/delete_medicine/${medicineId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(response => {
+            if (response.ok) {
+                location.reload();  // Reload the page to reflect the changes
+            } else {
+                alert('Failed to delete medicine');
+            }
+        });
+    }
+}

@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up | DoseTracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
+{% extends 'layout.html' %}
+
+{% block content %}
 <body>
     <div class="sign-up-container">
         <h2>Create an Account</h2>
@@ -39,5 +34,6 @@
         }
     });
 </script>
-</html>
+
+{% endblock %}
 

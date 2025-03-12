@@ -36,6 +36,7 @@ def add_medicine():
         medicine_name = request.form.get('name')
         dosage = request.form.get('dosage')
         frequency = request.form.get('frequency')
+        notes = request.form.get('notes')
 
         # Find the medicine in the database or create it
         medicine = Medicine.query.filter_by(name=medicine_name).first()
@@ -49,14 +50,15 @@ def add_medicine():
             user_id=current_user.id,
             medicine_id=medicine.id,
             dosage=dosage,
-            frequency=frequency
+            frequency=frequency,
+            notes=notes
         )
 
         try:
             db.session.add(user_medicine)
             db.session.commit()
             flash('Medicine added successfully!', 'success')
-            return redirect(url_for('medicines.view_medicines'))
+            return redirect(url_for('medicines.my_medicine'))
         except Exception as e:
             db.session.rollback()
             flash(f'Error: {e}', 'error')

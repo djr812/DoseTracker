@@ -57,31 +57,75 @@ body {
     padding: 40px;
 }
 
-/* Logo and App Title */
+/* Style for the container holding the logo and app title */
 .logo-container {
-    margin-bottom: 20px;
+    display: flex;  
+    align-items: center;  
+    gap: 10px;  
+    margin-bottom: 30px;  
 }
 
+/* Style for the logo image */
 .logo {
-    border-radius: 20%;
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
+    height: 50px;  
+    width: auto; 
+    border-radius: 5px; 
 }
 
+/* Style for the app title */
 .app-title {
-    color: #9b4d96;  /* Mauve color */
-    font-size: 28px;
-    font-weight: bold;
-    text-transform: uppercase;
+    font-size: 36px;  
+    font-weight: bold;  
+    color: #333;  
+    margin: 0;  
 }
 
-/* Form Styling */
+/* Style for the login form */
 .login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    margin-top: 30px;
+    display: block;  
 }
+
+/* Style for each form input field */
+.login-form input {
+    width: 100%;  
+    padding: 10px;
+    margin: 10px 0;  /* Add space between fields */
+    border: 1px solid #ccc;  /* Border color for input fields */
+    border-radius: 5px;  /* Rounded corners for input fields */
+    font-size: 16px;  /* Font size for input text */
+}
+
+/* Style for login button */
+.login-btn {
+    width: 100%;  /* Make the login button full width */
+    padding: 10px;
+    background-color: #9b4d96;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;  /* Rounded corners for button */
+}
+
+.login-btn:hover {
+    background-color: #7a3d74;
+}
+
+/* Style for the signup link */
+.signup-link {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.signup-link a {
+    color: #7a3d74;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
 
 label {
     font-size: 14px;
@@ -115,25 +159,6 @@ button {
 
 button:hover {
     background-color: #7a3d74;
-}
-
-/* Sign up link styling */
-.signup-link {
-    margin-top: 20px;
-}
-
-.signup-link p {
-    font-size: 14px;
-    color: #777;
-}
-
-.signup-link a {
-    color: #9b4d96;
-    text-decoration: none;
-}
-
-.signup-link a:hover {
-    text-decoration: underline;
 }
 
 /* Sign Up Page */
@@ -184,132 +209,111 @@ button:hover {
     background-color: #542a47;
 }
 
-.sign-up-link {
+.sign-up-link a {
     text-align: center;
     font-size: 14px;
+    color: #6c3f6e;
 }
 
-/* Table container for my_medicine page */
-.my_medicine_page .medicine-table-container {
-    padding: 15px;
-    margin-top: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+/* General Container Styling */
+.container {
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 
-/* Table container */
-.medicine-table-container {
-    padding: 15px;
-    margin-top: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.table {
+/* Medicines Table Styling */
+#medicines-table {
     width: 100%;
-    table-layout: fixed; 
-    border-collapse: collapse;
-    background-color: #f9f9f9;
-}
-
-/* Define the widths for the columns */
-.table th:nth-child(1),
-.table td:nth-child(1) {
-    width: 20%;  /* First column: Medicine Name */
-    background-color: #f9f9f9;
-}
-
-.table th:nth-child(2),
-.table td:nth-child(2) {
-    width: 15%;  /* Second column: Dosage */
-    background-color: #f9f9f9;
-}
-
-.table th:nth-child(3),
-.table td:nth-child(3) {
-    width: 15%;  /* Third column: Frequency */
-    background-color: #f9f9f9;
-}
-
-.table th:nth-child(4),
-.table td:nth-child(4) {
-    width: 30%;  /* Fourth column: Actions */
-    background-color: #f9f9f9;
-}
-
-/* Adjust the "Actions" column */
-.table td:last-child {
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    gap: 10px; 
-    padding: 10px 15px; 
-    min-width: 150px;  
-    box-sizing: border-box; 
-    height: 60px; 
-    background-color: #f9f9f9; 
-}
-
-/* Add a background color and style to the "Actions" header */
-.table th:nth-child(4) {
-    background-color: #f9f9f9;
-    text-align: center;
-    padding: 10px;
-}
-
-/* Styling for action buttons */
-.table td button {
-    padding: 6px 12px;
-    font-size: 14px;
-    color: white;
-    background-color: #9b4d96; /* Mauve color */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    width: auto; 
-    text-align: center;
-}
-
-/* Hover effect for buttons */
-.table td button:hover {
-    background-color: #7a3d74;
-}
-
-/* Add a minimum width for the action buttons if necessary */
-.table td button {
-    min-width: 70px;  
-    max-width: 120px; 
-}
-
-/* Adjust header font size */
-.table th {
-    font-size: 16px; 
-}
-
-/* Make sure the table is responsive */
-.table-responsive {
-    overflow-x: auto; 
-}
-
-/* Styling for buttons */
-#add-medicine-btn {
     margin-top: 20px;
-    background-color: #6c3f6e; /* Mauve color */
+    border-collapse: collapse;
+    font-size: 16px;
+}
+
+#medicines-table th, #medicines-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+#medicines-table th {
+    background-color: #f8f9fa; /* Light gray background */
+    font-weight: bold;
+}
+
+#medicines-table tr:nth-child(even) {
+    background-color: #f9f9f9; /* Light background for alternating rows */
+}
+
+#medicines-table tr:hover {
+    background-color: #f1f1f1; /* Slight hover effect */
+}
+
+#medicines-col-header {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Button Styling */
+#add-medicine-btn, .btn-primary, .btn-danger {
+    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+#add-medicine-btn {
+    margin-bottom: 20px;
+}
+
+#add-medicine-btn {
+    background-color: #6c3f6e;
     color: white;
     border: none;
-    padding: 12px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s;
 }
 
 #add-medicine-btn:hover {
     background-color: #542a47;
+    cursor: pointer;
 }
+
+/* Edit and Delete Buttons */
+.btn-primary {
+    background-color: #6c3f6e;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #138496;
+    cursor: pointer;
+}
+
+.btn-danger {
+    background-color: #6c3f6e;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    cursor: pointer;
+}
+
+/* Container for the action buttons (Edit & Delete) */
+.action-buttons {
+    display: flex;
+    gap: 10px; 
+    justify-content: flex-start; 
+}
+
+/* Individual button style in the action-buttons div */
+.action-buttons .btn {
+    margin: 0; 
+}
+
+/* Additional Styling for Alerts, Error Messages, etc. */
+.alert {
+    margin-top: 20px;
+}
+
 
 /* Footer styles */
 .footer {
