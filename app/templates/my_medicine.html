@@ -24,6 +24,7 @@
 
     <!-- Button to add a new medicine -->
     <button class="btn btn-primary" id="add-medicine-btn" onclick="window.location.href='/medicines/add_medicine'">Add New Medicine</button>
+    <button class="btn btn-primary" id="email-medicine-btn" onclick="sendEmail()">Send E-Mail</button>
 </div>
 
 <script>
@@ -81,6 +82,20 @@ function deleteMedicine(medicineId) {
         });
     }
 };
+
+function sendEmail() {
+        // Ask the user for their email address using a prompt
+        let userEmail = prompt("Please enter your email address:");
+        
+        // Validate the email format
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (emailRegex.test(userEmail)) {
+            // Redirect the user to the /send_pdf route with the email address
+            window.location.href = `/send_pdf/${userEmail}`;
+        } else {
+            alert("Invalid email address. Please try again.");
+        }
+    };
 
 </script>
 {% endblock %}

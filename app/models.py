@@ -1,8 +1,8 @@
-from app.application import db, bcrypt 
-
+from app.extensions import db, bcrypt
 
 # Users table for storing user information
 class User(db.Model):
+
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -37,6 +37,7 @@ class User(db.Model):
 
 # Medicines table to store the medicine information
 class Medicine(db.Model):
+    
     __tablename__ = 'medicines'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -52,6 +53,7 @@ class Medicine(db.Model):
 
 # User-Medicine table for storing user-specific data about medicines they are tracking
 class UserMedicine(db.Model):
+    
     __tablename__ = 'user_medicines'
 
     id = db.Column(db.Integer, primary_key=True)
