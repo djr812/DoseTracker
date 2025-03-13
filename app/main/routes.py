@@ -20,9 +20,9 @@ def send_pdf(user_email):
     pdf_output = generate_pdf()
 
     # Send the email with the attached PDF
-    msg = Message('Your Dose Tracker Report', recipients=[user_email])
+    msg = Message('Your Dose Tracker Report', recipients=[user_email], sender='Dose Tracker <dave@djrogers.net.au>')
     msg.body = 'Please find attached your medicines report.'
-    msg.sender = 'David Rogers'
+    #msg.sender = 'David Rogers'
     
     # Attach the generated PDF
     msg.attach('medicines_report.pdf', 'application/pdf', pdf_output)

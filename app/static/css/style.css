@@ -271,6 +271,18 @@ button:hover {
     cursor: pointer;
 }
 
+#email-medicine-btn {
+    background-color: #6c3f6e;
+    color: white;
+    border: none;  
+    vertical-align: top;  
+}
+
+#email-medicine-btn:hover {
+    background-color: #542a47;
+    cursor: pointer;
+}
+
 .btn-link {
     text-decoration: none;
     font-size: 14px;

@@ -8,6 +8,7 @@ from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
+from reportlab.lib.colors import HexColor
 from app.models import User, UserMedicine, Medicine
 from app.extensions import db, bcrypt
 
@@ -77,7 +78,7 @@ def generate_pdf():
 
     # Add the logo
     logo_path = "app/static/img/logo.png"  # Adjust the path to your static folder location
-    c.drawImage(logo_path, 30, title_height + 10, width=50, height=50)  # Logo at the top left
+    c.drawImage(logo_path, 30, title_height + 10, width=55, height=50)  # Logo at the top left
 
     # Set title text color to white for contrast
     c.setFillColor('#FFFFFF')
@@ -85,20 +86,17 @@ def generate_pdf():
     c.drawString(100, title_height + 25, "Dose Tracker")
 
     # Query the user's email from the Users table
-    user = User.query.get(current_user.id)  # Assuming current_user is properly set
+    user = User.query.get(current_user.id)  
     user_email = user.email if user else 'Unknown'
-
+    
     # Subtitle: User's Email (Dark grey)
     c.setFillColor('#333333')  # Dark grey color for the email subtitle
     c.setFont("Helvetica", 12)
     c.drawString(100, title_height - title_margin, f"Report for: {user_email}")
 
-    # Line separation for clarity
-    c.line(30, title_height - title_margin - 10, 580, title_height - title_margin - 10)
-
     # Set up the table header with a background color
     c.setFillColor('#9b4d96')  # Mauve for the table header background
-    c.rect(30, 670, 540, 20, fill=1)  # Draw header background
+    c.rect(30, 670, 540, 20, fill=1)  
 
     # Table header text (white)
     c.setFillColor('#FFFFFF')
@@ -115,7 +113,7 @@ def generate_pdf():
     # Query medicines associated with the current user
     user_medicines = UserMedicine.query.filter_by(user_id=current_user.id).all()
     medicines = []
-    
+
     # Fetching associated medicine names for each user_medicine entry
     y_position = 650  # Start position for the table rows
     for user_medicine in user_medicines:
