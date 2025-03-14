@@ -103,6 +103,7 @@ def delete_medicine(medicine_id):
 
 
 @medicines.route('/edit_medicine/<int:medicine_id>', methods=['GET', 'POST'])
+@login_required
 def edit_medicine(medicine_id):
     try:
         # Retrieve the medicine from the database based on its ID

@@ -99,7 +99,6 @@ def forgot_password():
             # Create the reset token
             token = s.dumps(email, salt='reset-password')
             token = quote_plus(token)
-            print ('Generated token: ', token)
             reset_link = url_for('auth.reset_password', token=token, _external=True)
             
             # Send the reset password link via email

@@ -14,6 +14,7 @@ def index():
 
 
 @main_bp.route('/send_pdf/<user_email>')
+@login_required
 def send_pdf(user_email):
     print(f"Sending PDF to {user_email}")
 
