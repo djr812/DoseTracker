@@ -114,6 +114,20 @@ body {
     text-decoration: underline;
 }
 
+.forgot-password-link {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.forgot-password-link a {
+    color: #9b4d96;  /* Mauve color */
+    text-decoration: none;
+}
+
+.forgot-password-link a:hover {
+    text-decoration: underline;
+}
+
 label {
     font-size: 14px;
     font-weight: 600;
