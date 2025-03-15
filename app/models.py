@@ -1,6 +1,6 @@
 from app.extensions import db, bcrypt
 
-# Users table for storing user information
+
 class User(db.Model):
 
     __tablename__ = 'users'
@@ -11,8 +11,8 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
-    # One-to-many relationship: One user can have many user_medicines
     user_medicines = db.relationship('UserMedicine', backref='user', lazy=True)
+    reminders = db.relationship('MedicationReminder', backref='user', cascade='all, delete-orphan')
 
     def is_active(self):
         return True  
@@ -35,7 +35,7 @@ class User(db.Model):
     def __repr__(self):
         return f"<User {self.email}>"
 
-# Medicines table to store the medicine information
+
 class Medicine(db.Model):
     
     __tablename__ = 'medicines'
@@ -45,13 +45,12 @@ class Medicine(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
-    # One-to-many relationship: One medicine can be associated with many user_medicines
     user_medicines = db.relationship('UserMedicine', backref='medicine', lazy=True)
 
     def __repr__(self):
         return f"<Medicine {self.name}>"
 
-# User-Medicine table for storing user-specific data about medicines they are tracking
+
 class UserMedicine(db.Model):
     
     __tablename__ = 'user_medicines'
@@ -65,5 +64,21 @@ class UserMedicine(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
+    reminders = db.relationship('MedicationReminder', backref='user_medicine', cascade='all, delete-orphan')
+
     def __repr__(self):
         return f"<UserMedicine User: {self.user_id}, Medicine: {self.medicine_id}>"
+
+
+class MedicationReminder(db.Model):
+
+    __tablename__ = 'medication_reminders'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    user_medicine_id = db.Column(db.Integer, db.ForeignKey('user_medicines.id', ondelete='CASCADE'), nullable=False)
+    reminder_time = db.Column(db.DateTime, nullable=False)
+    reminder_message = db.Column(db.String(255), nullable=True)
+    status = db.Column(db.Enum('pending', 'sent', name='reminder_status'), default='pending')
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())

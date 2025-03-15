@@ -92,9 +92,9 @@ def my_medicine():
 @login_required
 def delete_medicine(medicine_id):
     # Find the record from the user_medicines table
-    user_medicine = UserMedicine.query.filter_by(id=medicine_id, user_id=current_user.id).first()
-
-    if user_medicine:
+    user_medicine = UserMedicine.query.filter_by(medicine_id=medicine_id, user_id=current_user.id).first()
+    
+    if user_medicine is not None:
         db.session.delete(user_medicine)
         db.session.commit()
         return jsonify({'message': 'Medicine deleted successfully'}), 200
