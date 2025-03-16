@@ -161,30 +161,37 @@ def edit_medicine(medicine_id):
     except Exception as e:
         # Log the error if medicine is not found
         print(f"Error retrieving medicine with ID {medicine_id}: {e}")
-        return "Error: Medicine not found", 404
+        return jsonify({'error': 'Medicine not found'}), 404
     
     user_medicine = UserMedicine.query.filter_by(medicine_id=medicine_id).first()
 
     if user_medicine is None:
         # Handle the case where the user doesn't have a UserMedicine entry
-        return render_template('edit_medicine.html', error="Medicine data not found.")
+        return jsonify({'error': 'Medicine data not found.'}), 404
 
     if request.method == 'POST':
-        # Get the updated details from the form
-        medicine.name = request.form['name']
-        user_medicine.dosage = request.form['dosage']
-        user_medicine.frequency = request.form['frequency']
-        user_medicine.notes = request.form['notes']
-        
-        # Save the updated medicine details to the database
+        # Get the updated details from the JSON request
+        data = request.get_json()
+
+        # Update the medicine and user_medicine details
+        medicine.name = data['name']
+        user_medicine.dosage = data['dosage']
+        user_medicine.frequency = data['frequency']
+        user_medicine.notes = data['notes']
+
+        # Update the reminder details if available
+        reminder = user_medicine.reminders[0]  # Assuming there is only one reminder
+        reminder.reminder_time = data['reminder_time']
+        reminder.reminder_message = data['reminder_message']
+        reminder.status = data['status']
+
         try:
             db.session.commit()
-            return redirect(url_for('medicines.my_medicine'))  # Redirect to a page showing all medicines
+            return jsonify({'success': True})
         except Exception as e:
             db.session.rollback()  # Rollback on error
             print(f"Error during commit: {e}")
-            return render_template('edit_medicine.html', medicine=medicine, user_medicine=user_medicine, error="Error updating medicine.")
-
+            return jsonify({'error': 'Error updating medicine.'}), 500
 
     # If the method is GET, render the form with the existing medicine data
     return render_template('edit_medicine.html', medicine=medicine, user_medicine=user_medicine)

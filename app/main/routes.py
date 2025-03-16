@@ -1,16 +1,33 @@
-from flask import Blueprint, render_template, make_response, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, current_app
 from flask_mail import Message
-from flask_login import login_required
-from app.application import generate_pdf
+from flask_login import login_required, login_user
+from app.forms import LoginForm  # Import the form class
+from app.models import User
+from app.application import generate_pdf, db
 import traceback
 
 
 main_bp = Blueprint('main', __name__)
 
 
-@main_bp.route('/')
+@main_bp.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    form = LoginForm()  
+
+    if form.validate_on_submit():
+        # Form is valid, authenticate the user
+        email = form.email.data
+        password = form.password.data
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if user and user.check_password(password):  
+            login_user(user)
+            return redirect(url_for('medicines.my_medicine'))  
+        
+        flash('Invalid login credentials', 'error')
+    
+    return render_template('index.html', form=form)
 
 
 @main_bp.route('/send_pdf/<user_email>')

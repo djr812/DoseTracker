@@ -1,39 +1,53 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<body>
     <div class="sign-up-container">
         <h2>Create an Account</h2>
+
         <form method="POST" action="{{ url_for('auth.sign_up') }}" class="sign-up-form">
+            {{ form.hidden_tag() }}  
+
             <div class="form-group-sign-up">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required>
+                {{ form.email(class="form-control", id="email", required=True) }}
+                {% if form.email.errors %}
+                    <ul class="error-list">
+                        {% for error in form.email.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             </div>
+
             <div class="form-group-sign-up">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                {{ form.password(class="form-control", id="password", required=True) }}
+                {% if form.password.errors %}
+                    <ul class="error-list">
+                        {% for error in form.password.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             </div>
+
             <div class="form-group-sign-up">
                 <label for="confirm_password">Confirm Password</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
+                {{ form.confirm_password(class="form-control", id="confirm_password", required=True) }}
+                {% if form.confirm_password.errors %}
+                    <ul class="error-list">
+                        {% for error in form.confirm_password.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             </div>
+
             <button type="submit" class="sign-up-btn">Sign Up</button>
         </form>
+
         <p class="sign-up-link">Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a></p>
     </div>
-</body>
-<script>
-    document.querySelector('form').addEventListener('submit', function (event) {
-        // Prevent form submission if there are any issues (like empty fields)
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-    
-        if (!email || !password) {
-            event.preventDefault();
-            alert("Both fields are required.");
-        }
-    });
-</script>
-
 {% endblock %}
+
 
