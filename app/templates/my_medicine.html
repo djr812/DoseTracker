@@ -6,13 +6,14 @@
     
     <!-- Table for displaying the medicines -->
     <div class="table-container">
-        <table id="medicines-table">
+        <table id="medicines-table" class="table table-striped">
             <thead id="medicines-thead">
                 <tr>
                     <th id="medicines-col-header">Name</th>
                     <th id="medicines-col-header">Dose</th>
                     <th id="medicines-col-header">Freq</th>
                     <th id="medicines-col-header">Notes</th>
+                    <th id="medicines-col-header">Reminders</th> <!-- New column for reminders -->
                     <th id="medicines-col-header">Actions</th>
                 </tr>
             </thead>
@@ -29,7 +30,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-    // Fetch medicines data from the API endpoint
+    // Fetch medicines and their reminder data from the API endpoint
         fetch('/medicines/api/medicines')
             .then(response => response.json())
             .then(medicines => {
@@ -38,12 +39,19 @@
                     // Loop through each medicine and create a table row
                     medicines.forEach(medicine => {
                         const row = document.createElement('tr');
+                        
+                        // Fetch reminders for each medicine 
+                        const reminders = medicine.reminders.map(reminder => `
+                            <p><strong>Time:</strong> ${reminder.reminder_time}<br>
+                               <strong>Status:</strong> ${reminder.status}</p>
+                        `).join('');  // Join the reminder details in case there are multiple
 
                         row.innerHTML = `
                             <td>${medicine.name}</td>
                             <td>${medicine.dosage}</td>
                             <td>${medicine.frequency}</td>
                             <td>${medicine.notes || 'N/A'}</td>
+                            <td>${reminders || 'No reminders set'}</td> <!-- Display reminders here -->
                             <td>
                                 <div class="action-buttons">
                                     <button class="btn btn-primary" onclick="window.location.href='/medicines/edit_medicine/${ medicine.id }'">Edit</button>
@@ -51,7 +59,7 @@
                                 </div>
                             </td>
                         `;
-
+                        
                         // Append the row to the table body
                         medicinesTableBody.appendChild(row);
                     });
@@ -64,26 +72,25 @@
             });
     });
 
-// Function to handle deleting a medicine
-function deleteMedicine(medicineId) {
-    
-    if (confirm("Are you sure you want to delete this medicine?")) {
-        fetch(`/medicines/delete_medicine/${medicineId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        }).then(response => {
-            if (response.ok) {
-                location.reload();  // Reload the page to reflect the changes
-            } else {
-                alert('Failed to delete medicine');
-            }
-        });
-    }
-};
+    // Function to handle deleting a medicine
+    function deleteMedicine(medicineId) {
+        if (confirm("Are you sure you want to delete this medicine?")) {
+            fetch(`/medicines/delete_medicine/${medicineId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(response => {
+                if (response.ok) {
+                    location.reload();  // Reload the page to reflect the changes
+                } else {
+                    alert('Failed to delete medicine');
+                }
+            });
+        }
+    };
 
-function sendEmail() {
+    function sendEmail() {
         // Ask the user for their email address using a prompt
         let userEmail = prompt("Please enter your email address:");
         
@@ -96,8 +103,5 @@ function sendEmail() {
             alert("Invalid email address. Please try again.");
         }
     };
-
 </script>
 {% endblock %}
-
-

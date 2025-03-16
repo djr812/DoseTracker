@@ -5,6 +5,7 @@
         <h1>Add New Medicine</h1>
 
         <form method="POST">
+            <!-- Medicine Details -->
             <div class="form-group">
                 <label for="name">Medicine Name</label>
                 <input type="text" class="form-control" id="name" name="name" required>
@@ -25,6 +26,25 @@
                 <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
             </div>
 
+            <div class="form-group">
+                <label for="reminder_time">Reminder Time</label>
+                <input type="datetime-local" class="form-control" id="reminder_time" name="reminder_time" required>
+            </div>
+
+            <div class="form-group">
+                <label for="reminder_message">Reminder Message</label>
+                <textarea class="form-control" id="reminder_message" name="reminder_message" rows="2"></textarea>
+            </div>
+
+            <!-- Reminder Status Dropdown -->
+            <div class="form-group">
+                <label for="status">Reminder Status</label>
+                <select class="form-control" id="status" name="status" required>
+                    <option value="pending">Pending</option>
+                    <option value="sent">Sent</option>
+                </select>
+            </div>
+
             <div class="d-flex justify-content-between align-items-center">
                 <!-- Add Medicine Button -->
                 <button type="submit" class="btn btn-primary">Add Medicine</button>
@@ -35,4 +55,3 @@
         </form>
     </div>
 {% endblock %}
-

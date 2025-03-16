@@ -82,3 +82,12 @@ class MedicationReminder(db.Model):
     status = db.Column(db.Enum('pending', 'sent', name='reminder_status'), default='pending')
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    __table_args__ = (
+        db.Index('idx_user_id', 'user_id'),
+        db.Index('idx_user_medicine_id', 'user_medicine_id'),
+        db.Index('idx_reminder_time', 'reminder_time'),
+    )
+
+    def __repr__(self):
+        return f"<MedicationReminder User: {self.user_id}, Medicine: {self.user_medicine_id}, Time: {self.reminder_time}, Status: {self.status}>"

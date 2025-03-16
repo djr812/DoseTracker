@@ -250,6 +250,37 @@ button:hover {
     font-weight: bold;
 }
 
+#medicines-table th:nth-child(1), /* Name column */
+#medicines-table td:nth-child(1) {
+    width: 10%;
+}
+
+#medicines-table th:nth-child(2), /* Dose column */
+#medicines-table td:nth-child(2) {
+    width: 5%;
+}
+
+#medicines-table th:nth-child(3), /* Freq column */
+#medicines-table td:nth-child(3) {
+    width: 10%;
+}
+
+#medicines-table th:nth-child(4), /* Notes column */
+#medicines-table td:nth-child(4) {
+    width: 35%;
+}
+
+#medicines-table th:nth-child(5), /* Reminders column */
+#medicines-table td:nth-child(5) {
+    width: 30%;
+}
+
+#medicines-table th:nth-child(6), /* Actions column */
+#medicines-table td:nth-child(6) {
+    width: 10%;
+}
+
+
 #medicines-table tr:nth-child(even) {
     background-color: #f9f9f9; 
 }

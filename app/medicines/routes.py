@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import login_required, current_user
-from app.models import Medicine, UserMedicine
+from app.models import Medicine, UserMedicine, MedicationReminder
 from app.application import db
 
 
@@ -14,15 +14,28 @@ def api_medicines():
     user_medicines = UserMedicine.query.filter_by(user_id=current_user.id).all()
     medicines = []
     
-    # Fetch associated medicine names for each user_medicine entry
+    # Fetch associated medicine names and reminders for each user_medicine entry
     for user_medicine in user_medicines:
         medicine = Medicine.query.get(user_medicine.medicine_id)
+        
+        # Fetch reminders for this user_medicine
+        reminders = MedicationReminder.query.filter_by(user_medicine_id=user_medicine.id).all()
+        
+        # Add reminder details to the medicine data
+        reminder_data = []
+        for reminder in reminders:
+            reminder_data.append({
+                'reminder_time': reminder.reminder_time,
+                'status': reminder.status
+            })
+        
         medicines.append({
             'id': medicine.id,
             'name': medicine.name,
             'dosage': user_medicine.dosage,
             'frequency': user_medicine.frequency,
-            'notes': user_medicine.notes
+            'notes': user_medicine.notes,
+            'reminders': reminder_data  # Include reminder data here
         })
     
     return jsonify(medicines)
@@ -37,6 +50,11 @@ def add_medicine():
         dosage = request.form.get('dosage')
         frequency = request.form.get('frequency')
         notes = request.form.get('notes')
+
+        # Get reminder details from the form
+        reminder_time = request.form.get('reminder_time')
+        reminder_message = request.form.get('reminder_message')
+        reminder_status = request.form.get('status')  # New: get the status from the form
 
         # Find the medicine in the database or create it
         medicine = Medicine.query.filter_by(name=medicine_name).first()
@@ -57,13 +75,28 @@ def add_medicine():
         try:
             db.session.add(user_medicine)
             db.session.commit()
-            flash('Medicine added successfully!', 'success')
+
+            # Create a reminder if reminder details are provided
+            if reminder_time and reminder_message:
+                reminder = MedicationReminder(
+                    user_id=current_user.id,
+                    user_medicine_id=user_medicine.id,
+                    reminder_time=reminder_time,
+                    reminder_message=reminder_message,
+                    status=reminder_status  # New: setting the reminder status
+                )
+                db.session.add(reminder)
+                db.session.commit()
+
+            flash('Medicine and reminder added successfully!', 'success')
             return redirect(url_for('medicines.my_medicine'))
+
         except Exception as e:
             db.session.rollback()
             flash(f'Error: {e}', 'error')
 
     return render_template('add_medicine.html')
+
 
 
 # Route for viewing the user's medicines
@@ -74,16 +107,29 @@ def my_medicine():
     user_medicines = UserMedicine.query.filter_by(user_id=current_user.id).all()
     medicines = []
     
-    # Fetching associated medicine names for each user_medicine entry
+    # Fetch associated medicine names and reminders for each user_medicine entry
     for user_medicine in user_medicines:
         medicine = Medicine.query.get(user_medicine.medicine_id)
+        
+        # Fetch reminders for this user_medicine
+        reminders = MedicationReminder.query.filter_by(user_medicine_id=user_medicine.id).all()
+        
+        # Format reminder data for template
+        reminder_data = []
+        for reminder in reminders:
+            reminder_data.append({
+                'reminder_time': reminder.reminder_time,
+                'status': reminder.status
+            })
+        
         medicines.append({
             'id': medicine.id,
             'name': medicine.name,
             'dosage': user_medicine.dosage,
             'frequency': user_medicine.frequency,
-            'notes': user_medicine.notes
-        })
+            'notes': user_medicine.notes,
+            'reminders': reminder_data  # Add reminders to the template data
+    })
     
     return render_template('my_medicine.html', medicines=medicines, page_class='my_medicine_page')
 
@@ -95,6 +141,10 @@ def delete_medicine(medicine_id):
     user_medicine = UserMedicine.query.filter_by(medicine_id=medicine_id, user_id=current_user.id).first()
     
     if user_medicine is not None:
+        # Delete associated reminders for the medicine
+        MedicationReminder.query.filter_by(user_medicine_id=user_medicine.id).delete()
+
+        # Delete the user_medicine record
         db.session.delete(user_medicine)
         db.session.commit()
         return jsonify({'message': 'Medicine deleted successfully'}), 200
