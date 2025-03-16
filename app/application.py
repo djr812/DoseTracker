@@ -3,6 +3,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_login import current_user
+from flask_wtf.csrf import CSRFProtect
 from config import Config
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
@@ -51,6 +52,8 @@ def create_app():
         from .auth.routes import auth_bp  
         from .main.routes import main_bp
         from .medicines.routes import medicines
+
+    csrf = CSRFProtect(app)
 
     @login_manager.user_loader
     def load_user(user_id):

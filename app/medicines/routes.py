@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import login_required, current_user
 from app.models import Medicine, UserMedicine, MedicationReminder
-from app.application import db
+from app.application import db 
+from app.forms import MedicineForm, ReminderForm
 
 
 # Define the blueprint for medicines routes
@@ -45,16 +46,14 @@ def api_medicines():
 @medicines.route('/add_medicine', methods=['GET', 'POST'])
 @login_required
 def add_medicine():
-    if request.method == 'POST':
-        medicine_name = request.form.get('name')
-        dosage = request.form.get('dosage')
-        frequency = request.form.get('frequency')
-        notes = request.form.get('notes')
+    medicine_form = MedicineForm()
+    reminder_form = ReminderForm()
 
-        # Get reminder details from the form
-        reminder_time = request.form.get('reminder_time')
-        reminder_message = request.form.get('reminder_message')
-        reminder_status = request.form.get('status')  # New: get the status from the form
+    if medicine_form.validate_on_submit():
+        medicine_name = medicine_form.name.data
+        dosage = medicine_form.dosage.data
+        frequency = medicine_form.frequency.data
+        notes = medicine_form.notes.data
 
         # Find the medicine in the database or create it
         medicine = Medicine.query.filter_by(name=medicine_name).first()
@@ -77,13 +76,13 @@ def add_medicine():
             db.session.commit()
 
             # Create a reminder if reminder details are provided
-            if reminder_time and reminder_message:
+            if reminder_form.reminder_time.data and reminder_form.reminder_message.data:
                 reminder = MedicationReminder(
                     user_id=current_user.id,
                     user_medicine_id=user_medicine.id,
-                    reminder_time=reminder_time,
-                    reminder_message=reminder_message,
-                    status=reminder_status  # New: setting the reminder status
+                    reminder_time=reminder_form.reminder_time.data,
+                    reminder_message=reminder_form.reminder_message.data,
+                    status=reminder_form.status.data  # Using reminder status from the form
                 )
                 db.session.add(reminder)
                 db.session.commit()
@@ -95,8 +94,7 @@ def add_medicine():
             db.session.rollback()
             flash(f'Error: {e}', 'error')
 
-    return render_template('add_medicine.html')
-
+    return render_template('add_medicine.html', medicine_form=medicine_form, reminder_form=reminder_form)
 
 
 # Route for viewing the user's medicines
@@ -134,12 +132,12 @@ def my_medicine():
     return render_template('my_medicine.html', medicines=medicines, page_class='my_medicine_page')
 
 
-@medicines.route('/delete_medicine/<int:medicine_id>', methods=['DELETE'])
+@medicines.route('/delete_medicine/<int:medicine_id>', methods=['POST'])
 @login_required
 def delete_medicine(medicine_id):
     # Find the record from the user_medicines table
     user_medicine = UserMedicine.query.filter_by(medicine_id=medicine_id, user_id=current_user.id).first()
-    
+
     if user_medicine is not None:
         # Delete associated reminders for the medicine
         MedicationReminder.query.filter_by(user_medicine_id=user_medicine.id).delete()
@@ -147,9 +145,11 @@ def delete_medicine(medicine_id):
         # Delete the user_medicine record
         db.session.delete(user_medicine)
         db.session.commit()
-        return jsonify({'message': 'Medicine deleted successfully'}), 200
+        flash('Medicine deleted successfully!', 'success')
+        return redirect(url_for('medicines.my_medicine'))
     else:
-        return jsonify({'message': 'Medicine not found'}), 404
+        flash('Medicine not found.', 'danger')
+        return redirect(url_for('medicines.my_medicine'))
 
 
 @medicines.route('/edit_medicine/<int:medicine_id>', methods=['GET', 'POST'])

@@ -9,7 +9,6 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
-    
 </head>
 
 <body class="{{ page_class }}">
@@ -61,6 +60,22 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Include CSRF Token for all forms -->
+    {% if current_user.is_authenticated %}
+    <script>
+        // Automatically add the CSRF token to all forms
+        document.querySelectorAll("form").forEach(function(form) {
+            var csrfToken = "{{ csrf_token() }}";
+            var csrfInput = document.createElement("input");
+            csrfInput.type = "hidden";
+            csrfInput.name = "csrf_token";
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+        });
+    </script>
+    {% endif %}
 </body>
 
 </html>
+

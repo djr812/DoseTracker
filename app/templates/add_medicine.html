@@ -5,53 +5,73 @@
         <h1>Add New Medicine</h1>
 
         <form method="POST">
+            {{ medicine_form.hidden_tag() }}
+
             <!-- Medicine Details -->
             <div class="form-group">
                 <label for="name">Medicine Name</label>
-                <input type="text" class="form-control" id="name" name="name" required>
+                {{ medicine_form.name(class="form-control", id="name") }}
+                {% for error in medicine_form.name.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="form-group">
                 <label for="dosage">Dosage</label>
-                <input type="text" class="form-control" id="dosage" name="dosage" required>
+                {{ medicine_form.dosage(class="form-control", id="dosage") }}
+                {% for error in medicine_form.dosage.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="form-group">
                 <label for="frequency">Frequency</label>
-                <input type="text" class="form-control" id="frequency" name="frequency" required>
+                {{ medicine_form.frequency(class="form-control", id="frequency") }}
+                {% for error in medicine_form.frequency.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="form-group">
                 <label for="notes">Notes</label>
-                <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+                {{ medicine_form.notes(class="form-control", id="notes") }}
+                {% for error in medicine_form.notes.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
             </div>
+
+            <!-- Reminder Form -->
+            <h3>Reminder Settings</h3>
 
             <div class="form-group">
                 <label for="reminder_time">Reminder Time</label>
-                <input type="datetime-local" class="form-control" id="reminder_time" name="reminder_time" required>
+                {{ reminder_form.reminder_time(class="form-control", id="reminder_time") }}
+                {% for error in reminder_form.reminder_time.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="form-group">
                 <label for="reminder_message">Reminder Message</label>
-                <textarea class="form-control" id="reminder_message" name="reminder_message" rows="2"></textarea>
+                {{ reminder_form.reminder_message(class="form-control", id="reminder_message") }}
+                {% for error in reminder_form.reminder_message.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
             </div>
 
-            <!-- Reminder Status Dropdown -->
             <div class="form-group">
                 <label for="status">Reminder Status</label>
-                <select class="form-control" id="status" name="status" required>
-                    <option value="pending">Pending</option>
-                    <option value="sent">Sent</option>
-                </select>
+                {{ reminder_form.status(class="form-control", id="status") }}
+                {% for error in reminder_form.status.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
             </div>
 
-            <div class="d-flex justify-content-between align-items-center">
-                <!-- Add Medicine Button -->
-                <button type="submit" class="btn btn-primary">Add Medicine</button>
+            <!-- Add Medicine Button -->
+            <button type="submit" class="btn btn-primary">Add Medicine</button>
 
-                <!-- Link to My Medicines Page -->
-                <a href="{{ url_for('medicines.my_medicine') }}" class="btn btn-link">Back to Medicines</a>
-            </div>
+            <!-- Link to My Medicines Page -->
+            <a href="{{ url_for('medicines.my_medicine') }}" class="btn btn-link">Back to Medicines</a>
         </form>
     </div>
 {% endblock %}
