@@ -31,7 +31,7 @@
                         </td>
                         <td>
                             <!-- Edit Button (redirects to edit page) -->
-                            <a href="{{ url_for('medicines.edit_medicine', medicine_id=medicine.id) }}" class="btn btn-info">Edit</a>
+                            <a href="{{ url_for('medicines.edit_medicine', medicine_id=medicine.id) }}" class="btn btn-primary mr-2">Edit</a>
 
                             <!-- Delete Button (Wrapped in a POST form to simulate DELETE method) -->
                             <form action="{{ url_for('medicines.delete_medicine', medicine_id=medicine.id) }}" method="POST" style="display:inline;">
@@ -48,7 +48,7 @@
 
         <div class="d-flex justify-content-start mt-3">
             <a href="{{ url_for('medicines.add_medicine') }}" class="btn btn-primary mr-2">Add New Medicine</a>
-            <button class="btn btn-secondary" onclick="sendEmail()">Send Email</button>
+            <button class="btn btn-primary mr-2" onclick="sendEmail()">Send Email</button>
         </div>
     </div>
 

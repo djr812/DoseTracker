@@ -53,7 +53,7 @@ def send_pdf(user_email):
         print("Sending email...")
         current_app.extensions['mail'].send(msg)
         print("Email sent!")
-        return render_template('my_medicine.html', page_class='my_medicine_page')
+        return redirect(url_for('medicines.my_medicine'))
     
     except Exception as e:
         return f"An error occurred: {e}"

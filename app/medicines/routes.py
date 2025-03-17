@@ -2,7 +2,8 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_required, current_user
 from app.models import Medicine, UserMedicine, MedicationReminder
 from app.application import db 
-from app.forms import MedicineForm, ReminderForm
+from app.forms import MedicineForm, ReminderForm, EditMedicineForm
+from datetime import datetime
 
 
 # Define the blueprint for medicines routes
@@ -152,46 +153,61 @@ def delete_medicine(medicine_id):
         return redirect(url_for('medicines.my_medicine'))
 
 
+from datetime import datetime
+
 @medicines.route('/edit_medicine/<int:medicine_id>', methods=['GET', 'POST'])
 @login_required
 def edit_medicine(medicine_id):
-    try:
-        # Retrieve the medicine from the database based on its ID
-        medicine = Medicine.query.get_or_404(medicine_id)
-    except Exception as e:
-        # Log the error if medicine is not found
-        print(f"Error retrieving medicine with ID {medicine_id}: {e}")
-        return jsonify({'error': 'Medicine not found'}), 404
+    medicine = Medicine.query.get_or_404(medicine_id)
+    user_medicine = UserMedicine.query.filter_by(medicine_id=medicine_id, user_id=current_user.id).first_or_404()
     
-    user_medicine = UserMedicine.query.filter_by(medicine_id=medicine_id).first()
+    form = EditMedicineForm()
 
-    if user_medicine is None:
-        # Handle the case where the user doesn't have a UserMedicine entry
-        return jsonify({'error': 'Medicine data not found.'}), 404
+    # ONLY populate form in GET requests
+    if request.method == 'GET':
+        form.name.data = medicine.name
+        form.dosage.data = user_medicine.dosage
+        form.frequency.data = user_medicine.frequency
+        form.notes.data = user_medicine.notes
+        if user_medicine.reminders:
+            reminder = user_medicine.reminders[0]
+            form.reminder_time.data = reminder.reminder_time
+            form.reminder_message.data = reminder.reminder_message
+            form.status.data = reminder.status
 
-    if request.method == 'POST':
-        # Get the updated details from the JSON request
-        data = request.get_json()
+    if form.validate_on_submit():
+        # Update models using form data
+        medicine.name = form.name.data.strip()
+        user_medicine.dosage = form.dosage.data.strip()
+        user_medicine.frequency = form.frequency.data.strip()
+        user_medicine.notes = form.notes.data.strip()
+        
+        # Handle reminder time update
+        if form.reminder_time.data:
+            try:
+                # Check if reminder_time is already a datetime object
+                if isinstance(form.reminder_time.data, datetime):
+                    reminder_time = form.reminder_time.data
+                else:
+                    # Convert from string to datetime if it's not already a datetime object
+                    reminder_time = datetime.strptime(form.reminder_time.data, '%Y-%m-%dT%H:%M')
 
-        # Update the medicine and user_medicine details
-        medicine.name = data['name']
-        user_medicine.dosage = data['dosage']
-        user_medicine.frequency = data['frequency']
-        user_medicine.notes = data['notes']
-
-        # Update the reminder details if available
-        reminder = user_medicine.reminders[0]  # Assuming there is only one reminder
-        reminder.reminder_time = data['reminder_time']
-        reminder.reminder_message = data['reminder_message']
-        reminder.status = data['status']
+                if user_medicine.reminders:
+                    reminder = user_medicine.reminders[0]
+                    reminder.reminder_time = reminder_time
+                    reminder.reminder_message = form.reminder_message.data.strip()
+                    reminder.status = form.status.data.strip()
+            except ValueError:
+                flash('Invalid reminder time format.', 'error')
+                return render_template('edit_medicine.html', form=form, medicine=medicine, user_medicine=user_medicine)
 
         try:
             db.session.commit()
-            return jsonify({'success': True})
+            flash('Changes saved successfully!', 'success')
+            return redirect(url_for('medicines.my_medicine'))
         except Exception as e:
-            db.session.rollback()  # Rollback on error
-            print(f"Error during commit: {e}")
-            return jsonify({'error': 'Error updating medicine.'}), 500
+            db.session.rollback()
+            flash('Update failed. Please try again.', 'error')
+            print(f"Database error: {str(e)}")
 
-    # If the method is GET, render the form with the existing medicine data
-    return render_template('edit_medicine.html', medicine=medicine, user_medicine=user_medicine)
+    return render_template('edit_medicine.html', form=form, medicine=medicine, user_medicine=user_medicine)

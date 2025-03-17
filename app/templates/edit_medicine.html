@@ -4,115 +4,65 @@
 <div class="container">
     <h2>Edit Medicine</h2>
 
-    {% if error %}
-        <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
-
-    <form id="edit-medicine-form">
-        <!-- Flask-WTF's CSRF token -->
-        {{ form.hidden_tag() }} 
+    <form method="POST" action="{{ url_for('medicines.edit_medicine', medicine_id=medicine.id) }}">
+        {{ form.hidden_tag() }}  <!-- CSRF token -->
 
         <!-- Name Field -->
         <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ medicine.name }}" required>
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control", placeholder="Enter medicine name") }}
         </div>
 
         <!-- Dosage Field -->
         <div class="form-group">
-            <label for="dosage">Dose:</label>
-            <input type="text" class="form-control" id="dosage" name="dosage" value="{{ user_medicine.dosage }}" required>
+            {{ form.dosage.label(class="form-label") }}
+            {{ form.dosage(class="form-control", placeholder="Enter dosage") }}
         </div>
 
         <!-- Frequency Field -->
         <div class="form-group">
-            <label for="frequency">Freq:</label>
-            <input type="text" class="form-control" id="frequency" name="frequency" value="{{ user_medicine.frequency }}" required>
+            {{ form.frequency.label(class="form-label") }}
+            {{ form.frequency(class="form-control", placeholder="Enter frequency") }}
         </div>
 
         <!-- Notes Field -->
         <div class="form-group">
-            <label for="notes">Notes:</label>
-            <textarea name="notes" id="notes" class="form-control" rows="4" placeholder="Enter any additional notes here">{{ user_medicine.notes }}</textarea>
+            {{ form.notes.label(class="form-label") }}
+            {{ form.notes(class="form-control", rows=4, placeholder="Enter any additional notes") }}
         </div>
 
-        <!-- Reminder Time Field (only display if reminder exists) -->
-        {% if user_medicine.reminders and user_medicine.reminders[0] %}
+        <!-- Reminder Time Field (only if reminder exists) -->
+        {% if user_medicine.reminders %}
         <div class="form-group">
-            <label for="reminder_time">Reminder Time:</label>
-            <input type="datetime-local" class="form-control" id="reminder_time" name="reminder_time" value="{{ user_medicine.reminders[0].reminder_time.strftime('%Y-%m-%dT%H:%M') }}" required>
+            {{ form.reminder_time.label(class="form-label") }}
+            {% if form.reminder_time.data %}
+                <input type="datetime-local" class="form-control" name="reminder_time" value="{{ form.reminder_time.data.strftime('%Y-%m-%dT%H:%M') }}" />
+            {% else %}
+                <input type="datetime-local" class="form-control" name="reminder_time" value="" />
+            {% endif %}
         </div>
 
         <!-- Reminder Message Field -->
         <div class="form-group">
-            <label for="reminder_message">Reminder Message:</label>
-            <input type="text" class="form-control" id="reminder_message" name="reminder_message" value="{{ user_medicine.reminders[0].reminder_message }}" required>
+            {{ form.reminder_message.label(class="form-label") }}
+            {{ form.reminder_message(class="form-control", placeholder="Enter reminder message") }}
         </div>
 
-        <!-- Reminder Status Field -->
+        <!-- Status Field -->
         <div class="form-group">
-            <label for="status">Reminder Status:</label>
-            <select class="form-control" id="status" name="status" required>
-                <option value="pending" {% if user_medicine.reminders[0].status == 'pending' %}selected{% endif %}>Pending</option>
-                <option value="sent" {% if user_medicine.reminders[0].status == 'sent' %}selected{% endif %}>Sent</option>
-            </select>
+            {{ form.status.label(class="form-label") }}
+            {{ form.status(class="form-control") }}
         </div>
+
         {% else %}
         <p>No reminders set for this medicine.</p>
-        {% endif %}
+        {% endif %}  
 
-        <!-- Buttons Row -->
+        <!-- Submit Button -->
         <div class="form-group d-flex justify-content-between align-items-center">
-            <!-- Save Button -->
             <button type="submit" class="btn btn-primary">Save Changes</button>
-
-            <!-- Back to Medicines List Link -->
-            <a href="{{ url_for('medicines.my_medicine') }}" class="btn btn-link my-medicines-list">Back to Medicines List</a>
+            <a href="{{ url_for('medicines.my_medicine') }}" class="btn btn-link">Back to Medicines List</a>
         </div>
     </form>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('edit-medicine-form');
-
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();  // Prevent the default form submission
-
-            const formData = new FormData(form);
-            const data = {
-                name: formData.get('name'),
-                dosage: formData.get('dosage'),
-                frequency: formData.get('frequency'),
-                notes: formData.get('notes'),
-                reminder_time: formData.get('reminder_time'),
-                reminder_message: formData.get('reminder_message'),
-                status: formData.get('status')
-            };
-
-            // Make the AJAX request to update the medicine
-            fetch('{{ url_for("medicines.edit_medicine", medicine_id=medicine.id) }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token() }}'  // CSRF protection (if Flask-WTF is being used)
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(responseData => {
-                if (responseData.success) {
-                    // If successful, redirect to the medicines page
-                    window.location.href = "{{ url_for('medicines.my_medicine') }}";
-                } else {
-                    // Show error message
-                    alert(responseData.error || 'An error occurred');
-                }
-            })
-            .catch(error => {
-                alert('Error: ' + error);
-            });
-        });
-    });
-</script>
 {% endblock %}
