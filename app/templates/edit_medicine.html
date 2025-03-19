@@ -29,7 +29,7 @@
         </div>
 
         <h3>Reminder Settings</h3>
-        <div id="reminder-fields"></div>
+        <div id="reminder-fields" class="row"></div>
 
         <!-- Hidden div to pass reminder data to JavaScript -->
         <div id="existing-reminder-data" style="display: none;">
@@ -78,7 +78,7 @@
             // Create reminder fields dynamically based on number of reminders
             for (let i = 0; i < numberOfReminders; i++) {
                 const reminderSection = document.createElement('div');
-                reminderSection.classList.add('reminder-block');
+                reminderSection.classList.add('col'); // Each reminder gets a column class
 
                 // Get existing data for the reminder from reminderData
                 const reminderTime = window.reminderData[i] ? window.reminderData[i].reminder_time : '';
@@ -105,7 +105,28 @@
                     </div>
                 `;
 
+                // Append the reminderSection to the container
                 reminderFieldsContainer.appendChild(reminderSection);
+            }
+
+            // Adjust column width based on the number of reminders
+            if (numberOfReminders === 1) {
+                reminderFieldsContainer.classList.add('justify-content-center');
+            } else {
+                // Remove previous width classes
+                reminderFieldsContainer.classList.remove('justify-content-center');
+
+                // Adjust the width of each reminder depending on the frequency
+                const reminderColumns = document.querySelectorAll('#reminder-fields .col');
+                reminderColumns.forEach(col => {
+                    if (numberOfReminders === 2) {
+                        col.classList.add('col-md-6'); // 50% width for two reminders
+                    } else if (numberOfReminders === 3) {
+                        col.classList.add('col-md-4'); // 33.33% width for three reminders
+                    } else if (numberOfReminders === 4) {
+                        col.classList.add('col-md-3'); // 25% width for four reminders
+                    }
+                });
             }
         }
 

@@ -44,17 +44,9 @@
             <!-- Reminder Form -->
             <h3>Reminder Settings</h3>
 
-            <div id="reminder-fields">
+            <div id="reminder-fields" class="row">
                 <!-- Reminder fields will be dynamically added here -->
             </div>
-            
-            <div class="form-group">
-                <label for="reminder_status">Reminder Status</label>
-                {{ reminder_form.status(class="form-control", id="status") }}
-                {% for error in reminder_form.status.errors %}
-                    <div class="alert alert-danger">{{ error }}</div>
-                {% endfor %}
-            </div>          
 
             <!-- Add Medicine Button -->
             <button type="submit" class="btn btn-primary">Add Medicine</button>
@@ -76,9 +68,13 @@
             else if (frequency === 'Three Times a Day') numReminders = 3;
             else if (frequency === 'Four Times a Day') numReminders = 4;
 
+            // Calculate the column width for each reminder set (based on the number of reminders)
+            let columnWidth = 12 / numReminders;
+
+            // Dynamically add reminder fields
             for (let i = 0; i < numReminders; i++) {
                 let reminderDiv = document.createElement('div');
-                reminderDiv.className = 'form-group';
+                reminderDiv.className = `col-md-${columnWidth} form-group`;  // Apply dynamic column width
 
                 let reminderTimeLabel = document.createElement('label');
                 reminderTimeLabel.innerHTML = 'Reminder ' + (i + 1) + ' Time';
@@ -87,7 +83,7 @@
                 let reminderTimeInput = document.createElement('input');
                 reminderTimeInput.type = 'time';
                 reminderTimeInput.className = 'form-control';
-                reminderTimeInput.name = 'reminder_time_' + i;  // Name should be unique
+                reminderTimeInput.name = 'reminder_time_' + i;  // Unique name for each input
                 reminderDiv.appendChild(reminderTimeInput);
 
                 let reminderMessageLabel = document.createElement('label');
@@ -97,8 +93,22 @@
                 let reminderMessageInput = document.createElement('input');
                 reminderMessageInput.type = 'text';
                 reminderMessageInput.className = 'form-control';
-                reminderMessageInput.name = 'reminder_message_' + i;  // Name should be unique
+                reminderMessageInput.name = 'reminder_message_' + i;  // Unique name for each input
                 reminderDiv.appendChild(reminderMessageInput);
+
+                // Create the status field dynamically for each reminder set
+                let reminderStatusLabel = document.createElement('label');
+                reminderStatusLabel.innerHTML = 'Reminder ' + (i + 1) + ' Status';
+                reminderDiv.appendChild(reminderStatusLabel);
+
+                let reminderStatusSelect = document.createElement('select');
+                reminderStatusSelect.className = 'form-control';
+                reminderStatusSelect.name = 'reminder_status_' + i;  // Unique name for each status field
+                reminderStatusSelect.innerHTML = `
+                    <option value="pending">Pending</option>
+                    <option value="sent">Sent</option>
+                `;
+                reminderDiv.appendChild(reminderStatusSelect);
 
                 reminderFieldsContainer.appendChild(reminderDiv);
             }
