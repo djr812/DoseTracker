@@ -30,16 +30,14 @@
                             {% endfor %}
                         </td>
                         <td>
-                            <!-- Edit Button (redirects to edit page) -->
                             <a href="{{ url_for('medicines.edit_medicine', medicine_id=medicine.id) }}" class="btn btn-primary mr-2">Edit</a>
 
-                            <!-- Delete Button (Wrapped in a POST form to simulate DELETE method) -->
                             <form action="{{ url_for('medicines.delete_medicine', medicine_id=medicine.id) }}" method="POST" style="display:inline;">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> <!-- CSRF token inside a hidden input -->
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> 
                                 <input type="hidden" name="_method" value="DELETE">
                                 <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this medicine?');">Delete</button>
                             </form>
-                            
+            
                         </td>
                     </tr>
                 {% endfor %}

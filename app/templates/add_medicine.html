@@ -4,7 +4,8 @@
     <div class="container">
         <h1>Add New Medicine</h1>
 
-        <form method="POST">
+        <form method="POST" action="{{ url_for('medicines.add_medicine') }}">
+            
             {{ medicine_form.hidden_tag() }}
 
             <!-- Medicine Details -->
@@ -26,7 +27,7 @@
 
             <div class="form-group">
                 <label for="frequency">Frequency</label>
-                {{ medicine_form.frequency(class="form-control", id="frequency") }}
+                {{ medicine_form.frequency(class="form-control", id="frequency", onchange="updateReminderFields()") }}
                 {% for error in medicine_form.frequency.errors %}
                     <div class="alert alert-danger">{{ error }}</div>
                 {% endfor %}
@@ -43,29 +44,17 @@
             <!-- Reminder Form -->
             <h3>Reminder Settings</h3>
 
-            <div class="form-group">
-                <label for="reminder_time">Reminder Time</label>
-                {{ reminder_form.reminder_time(class="form-control", id="reminder_time") }}
-                {% for error in reminder_form.reminder_time.errors %}
-                    <div class="alert alert-danger">{{ error }}</div>
-                {% endfor %}
+            <div id="reminder-fields">
+                <!-- Reminder fields will be dynamically added here -->
             </div>
-
+            
             <div class="form-group">
-                <label for="reminder_message">Reminder Message</label>
-                {{ reminder_form.reminder_message(class="form-control", id="reminder_message") }}
-                {% for error in reminder_form.reminder_message.errors %}
-                    <div class="alert alert-danger">{{ error }}</div>
-                {% endfor %}
-            </div>
-
-            <div class="form-group">
-                <label for="status">Reminder Status</label>
+                <label for="reminder_status">Reminder Status</label>
                 {{ reminder_form.status(class="form-control", id="status") }}
                 {% for error in reminder_form.status.errors %}
                     <div class="alert alert-danger">{{ error }}</div>
                 {% endfor %}
-            </div>
+            </div>          
 
             <!-- Add Medicine Button -->
             <button type="submit" class="btn btn-primary">Add Medicine</button>
@@ -74,4 +63,50 @@
             <a href="{{ url_for('medicines.my_medicine') }}" class="btn btn-link">Back to Medicines</a>
         </form>
     </div>
+
+    <script type="text/javascript">
+        function updateReminderFields() {
+            let frequency = document.getElementById('frequency').value;
+            let reminderFieldsContainer = document.getElementById('reminder-fields');
+            reminderFieldsContainer.innerHTML = "";  // Clear existing reminder fields
+
+            let numReminders = 0;
+            if (frequency === 'Once a Day') numReminders = 1;
+            else if (frequency === 'Twice a Day') numReminders = 2;
+            else if (frequency === 'Three Times a Day') numReminders = 3;
+            else if (frequency === 'Four Times a Day') numReminders = 4;
+
+            for (let i = 0; i < numReminders; i++) {
+                let reminderDiv = document.createElement('div');
+                reminderDiv.className = 'form-group';
+
+                let reminderTimeLabel = document.createElement('label');
+                reminderTimeLabel.innerHTML = 'Reminder ' + (i + 1) + ' Time';
+                reminderDiv.appendChild(reminderTimeLabel);
+
+                let reminderTimeInput = document.createElement('input');
+                reminderTimeInput.type = 'time';
+                reminderTimeInput.className = 'form-control';
+                reminderTimeInput.name = 'reminder_time_' + i;  // Name should be unique
+                reminderDiv.appendChild(reminderTimeInput);
+
+                let reminderMessageLabel = document.createElement('label');
+                reminderMessageLabel.innerHTML = 'Reminder ' + (i + 1) + ' Message';
+                reminderDiv.appendChild(reminderMessageLabel);
+
+                let reminderMessageInput = document.createElement('input');
+                reminderMessageInput.type = 'text';
+                reminderMessageInput.className = 'form-control';
+                reminderMessageInput.name = 'reminder_message_' + i;  // Name should be unique
+                reminderDiv.appendChild(reminderMessageInput);
+
+                reminderFieldsContainer.appendChild(reminderDiv);
+            }
+        }
+
+        // Initialize reminder fields when the page loads (if frequency is preselected)
+        window.onload = function() {
+            updateReminderFields();
+        }
+    </script>
 {% endblock %}

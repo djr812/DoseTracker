@@ -3,7 +3,8 @@ from flask_login import login_required, current_user
 from app.models import Medicine, UserMedicine, MedicationReminder
 from app.application import db 
 from app.forms import MedicineForm, ReminderForm, EditMedicineForm
-from datetime import datetime
+from datetime import time, datetime
+from wtforms import TimeField, StringField, SelectField
 
 
 # Define the blueprint for medicines routes
@@ -50,6 +51,17 @@ def add_medicine():
     medicine_form = MedicineForm()
     reminder_form = ReminderForm()
 
+    if request.method == 'POST':
+        # Debugging - check reminder times and messages manually
+        print("Frequency:", medicine_form.frequency.data)
+        # Loop through dynamically generated reminder fields
+        reminder_count = get_reminder_count(medicine_form.frequency.data)
+        for i in range(reminder_count):
+            reminder_time = request.form.get(f'reminder_time_{i}')
+            reminder_message = request.form.get(f'reminder_message_{i}')
+            print(f"Reminder {i+1} Time: {reminder_time}")
+            print(f"Reminder {i+1} Message: {reminder_message}")
+
     if medicine_form.validate_on_submit():
         medicine_name = medicine_form.name.data
         dosage = medicine_form.dosage.data
@@ -71,31 +83,50 @@ def add_medicine():
             frequency=frequency,
             notes=notes
         )
+        db.session.add(user_medicine)
+        db.session.commit()
 
-        try:
-            db.session.add(user_medicine)
-            db.session.commit()
+        # Create a reminder if reminder details are provided
+        reminder_count = get_reminder_count(frequency)
+        for i in range(reminder_count):
+            reminder_time = request.form.get(f'reminder_time_{i}')
+            reminder_message = request.form.get(f'reminder_message_{i}')
+            status = reminder_form.status.data  # Using status from the form
 
-            # Create a reminder if reminder details are provided
-            if reminder_form.reminder_time.data and reminder_form.reminder_message.data:
+            print(f"Reminder {i+1} Time:", reminder_time)
+            print(f"Reminder {i+1} Message:", reminder_message)
+
+            if reminder_time and reminder_message:
                 reminder = MedicationReminder(
                     user_id=current_user.id,
                     user_medicine_id=user_medicine.id,
-                    reminder_time=reminder_form.reminder_time.data,
-                    reminder_message=reminder_form.reminder_message.data,
-                    status=reminder_form.status.data  # Using reminder status from the form
+                    reminder_time=reminder_time,
+                    reminder_message=reminder_message,
+                    status=status
                 )
                 db.session.add(reminder)
-                db.session.commit()
 
+        try:
+            db.session.commit()
             flash('Medicine and reminder added successfully!', 'success')
             return redirect(url_for('medicines.my_medicine'))
-
         except Exception as e:
             db.session.rollback()
             flash(f'Error: {e}', 'error')
 
     return render_template('add_medicine.html', medicine_form=medicine_form, reminder_form=reminder_form)
+
+
+def get_reminder_count(frequency):
+    if frequency == 'Once a Day':
+        return 1
+    elif frequency == 'Twice a Day':
+        return 2
+    elif frequency == 'Three Times a Day':
+        return 3
+    elif frequency == 'Four Times a Day':
+        return 4
+    return 0  # Default to 0 if no frequency is matched
 
 
 # Route for viewing the user's medicines
@@ -153,61 +184,96 @@ def delete_medicine(medicine_id):
         return redirect(url_for('medicines.my_medicine'))
 
 
-from datetime import datetime
-
 @medicines.route('/edit_medicine/<int:medicine_id>', methods=['GET', 'POST'])
 @login_required
 def edit_medicine(medicine_id):
+    # Retrieve the medicine and user_medicine from the database
     medicine = Medicine.query.get_or_404(medicine_id)
     user_medicine = UserMedicine.query.filter_by(medicine_id=medicine_id, user_id=current_user.id).first_or_404()
-    
+
+    # Create the form
     form = EditMedicineForm()
 
-    # ONLY populate form in GET requests
+    # Handle GET request to pre-fill the form with current data
     if request.method == 'GET':
         form.name.data = medicine.name
         form.dosage.data = user_medicine.dosage
         form.frequency.data = user_medicine.frequency
         form.notes.data = user_medicine.notes
+
+        # Prepare reminder data for JavaScript
+        reminder_data = []
         if user_medicine.reminders:
-            reminder = user_medicine.reminders[0]
-            form.reminder_time.data = reminder.reminder_time
-            form.reminder_message.data = reminder.reminder_message
-            form.status.data = reminder.status
+            for reminder in user_medicine.reminders:
+                reminder_data.append({
+                    'reminder_time': reminder.reminder_time.strftime('%H:%M') if reminder.reminder_time else '',
+                    'reminder_message': reminder.reminder_message or '',
+                    'status': reminder.status or 'pending'
+                })
 
-    if form.validate_on_submit():
-        # Update models using form data
-        medicine.name = form.name.data.strip()
-        user_medicine.dosage = form.dosage.data.strip()
-        user_medicine.frequency = form.frequency.data.strip()
-        user_medicine.notes = form.notes.data.strip()
-        
-        # Handle reminder time update
-        if form.reminder_time.data:
-            try:
-                # Check if reminder_time is already a datetime object
-                if isinstance(form.reminder_time.data, datetime):
-                    reminder_time = form.reminder_time.data
-                else:
-                    # Convert from string to datetime if it's not already a datetime object
-                    reminder_time = datetime.strptime(form.reminder_time.data, '%Y-%m-%dT%H:%M')
+        return render_template('edit_medicine.html', form=form, medicine=medicine, user_medicine=user_medicine, reminder_data=reminder_data)
 
-                if user_medicine.reminders:
-                    reminder = user_medicine.reminders[0]
+    # Handle POST request for form submission
+    if request.method == 'POST':
+        # Extract reminder data from the form dynamically based on the number of reminders
+        reminder_times = [request.form.get(f'reminder_time_{i}') for i in range(4)]  # Max 4 reminders
+        reminder_messages = [request.form.get(f'reminder_message_{i}') for i in range(4)]
+        statuses = [request.form.get(f'status_{i}') for i in range(4)]
+
+        # Debugging: Print reminder data and status
+        print(f"Reminder Times: {reminder_times}")
+        print(f"Reminder Messages: {reminder_messages}")
+        print(f"Statuses: {statuses}")
+        print(f"User ID: {current_user.id}")
+
+        # Manually validate statuses
+        valid_status_choices = ['pending', 'sent']
+        statuses = [status if status in valid_status_choices else 'pending' for status in statuses]
+
+        # Filter out empty reminder data
+        filtered_reminders = [
+            (time, message, status)
+            for time, message, status in zip(reminder_times, reminder_messages, statuses)
+            if time and message and status in valid_status_choices
+        ]
+
+        # Check if the form is valid
+        if form.validate_on_submit():
+            # Update basic medicine data
+            medicine.name = form.name.data.strip()
+            user_medicine.dosage = form.dosage.data.strip()
+            user_medicine.frequency = form.frequency.data.strip()
+            user_medicine.notes = form.notes.data.strip()
+
+            # Loop over the filtered reminder fields and update or create new reminders
+            for i, (reminder_time, reminder_message, status) in enumerate(filtered_reminders):
+                if i < len(user_medicine.reminders):
+                    reminder = user_medicine.reminders[i]  # Update existing reminder
                     reminder.reminder_time = reminder_time
-                    reminder.reminder_message = form.reminder_message.data.strip()
-                    reminder.status = form.status.data.strip()
-            except ValueError:
-                flash('Invalid reminder time format.', 'error')
-                return render_template('edit_medicine.html', form=form, medicine=medicine, user_medicine=user_medicine)
+                    reminder.reminder_message = reminder_message
+                    reminder.status = status
+                else:
+                    # If no reminder exists, create a new reminder
+                    new_reminder = MedicationReminder(
+                        reminder_time=reminder_time,
+                        reminder_message=reminder_message,
+                        status=status,
+                        user_medicine_id=user_medicine.id,  # Ensure user_medicine_id is set correctly
+                        user_id=current_user.id  # Ensure user_id is set correctly here
+                    )
+                    db.session.add(new_reminder)
 
-        try:
-            db.session.commit()
-            flash('Changes saved successfully!', 'success')
-            return redirect(url_for('medicines.my_medicine'))
-        except Exception as e:
-            db.session.rollback()
-            flash('Update failed. Please try again.', 'error')
-            print(f"Database error: {str(e)}")
+            # Commit changes to the database
+            try:
+                db.session.commit()
+                flash('Changes saved successfully!', 'success')
+                return redirect(url_for('medicines.my_medicine'))
+            except Exception as e:
+                db.session.rollback()
+                flash('Update failed. Please try again.', 'error')
+                print(f"Error: {e}")
+        else:
+            flash("Form validation failed", "error")
+            print("Form validation failed. Errors:", form.errors)
 
-    return render_template('edit_medicine.html', form=form, medicine=medicine, user_medicine=user_medicine)
+    return render_template('edit_medicine.html', form=form, medicine=medicine, user_medicine=user_medicine, reminder_data=[])

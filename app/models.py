@@ -77,7 +77,7 @@ class MedicationReminder(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     user_medicine_id = db.Column(db.Integer, db.ForeignKey('user_medicines.id', ondelete='CASCADE'), nullable=False)
-    reminder_time = db.Column(db.DateTime, nullable=False)
+    reminder_time = db.Column(db.Time, nullable=False)
     reminder_message = db.Column(db.String(255), nullable=True)
     status = db.Column(db.Enum('pending', 'sent', name='reminder_status'), default='pending')
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())

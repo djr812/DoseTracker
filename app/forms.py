@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, SelectField, DateTimeLocalField, DateTimeField
-from wtforms.validators import DataRequired, Email, EqualTo, Optional, Length
-from datetime import datetime
+from wtforms import StringField, PasswordField, TextAreaField, SelectField, TimeField
+from wtforms.validators import DataRequired, Email, EqualTo, Optional, InputRequired
+from wtforms.fields import FieldList
 
 
 class LoginForm(FlaskForm):
@@ -27,12 +27,24 @@ class ResetPasswordForm(FlaskForm):
 class MedicineForm(FlaskForm):
     name = StringField('Medicine Name', validators=[DataRequired()])
     dosage = StringField('Dosage', validators=[DataRequired()])
-    frequency = StringField('Frequency', validators=[DataRequired()])
+    
+    # Change to a SelectField for Frequency
+    frequency = SelectField(
+        'Frequency',
+        choices=[
+            ('Once a Day', 'Once a Day'),
+            ('Twice a Day', 'Twice a Day'),
+            ('Three Times a Day', 'Three Times a Day'),
+            ('Four Times a Day', 'Four Times a Day')
+        ],
+        validators=[DataRequired()]
+    )
+    
     notes = TextAreaField('Notes', validators=[Optional()])
 
 
 class ReminderForm(FlaskForm):
-    reminder_time = DateTimeLocalField('Reminder Time', validators=[Optional()])
+    reminder_time = TimeField('Reminder Time', validators=[Optional()], format='%H:%M') 
     reminder_message = TextAreaField('Reminder Message', validators=[Optional()])
     status = SelectField('Reminder Status', choices=[('pending', 'Pending'), ('sent', 'Sent')], default='pending', validators=[DataRequired()])
 
@@ -40,8 +52,22 @@ class ReminderForm(FlaskForm):
 class EditMedicineForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     dosage = StringField('Dose', validators=[DataRequired()])
-    frequency = StringField('Frequency', validators=[DataRequired()])
+
+    frequency = SelectField(
+        'Frequency',
+        choices=[('Once a Day', 'Once a Day'),
+                 ('Twice a Day', 'Twice a Day'),
+                 ('Three Times a Day', 'Three Times a Day'),
+                 ('Four Times a Day', 'Four Times a Day')],
+        validators=[InputRequired()]
+    )
+
     notes = TextAreaField('Notes', validators=[Optional()])
-    reminder_time = DateTimeField('Reminder Time', format='%Y-%m-%dT%H:%M')
-    reminder_message = StringField('Reminder Message', validators=[Optional()])
-    status = SelectField('Reminder Status', choices=[('pending', 'Pending'), ('sent', 'Sent')], validators=[Optional()])
+
+    reminder_time = FieldList(TimeField('Reminder Time', format='%H:%M'), min_entries=1, max_entries=4)
+    reminder_message = FieldList(StringField('Reminder Message'), min_entries=1, max_entries=4)
+    
+    # Remove the FieldList for status (we'll handle it manually in the route)
+
+
+
