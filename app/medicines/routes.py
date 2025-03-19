@@ -245,10 +245,19 @@ def edit_medicine(medicine_id):
             user_medicine.frequency = form.frequency.data.strip()
             user_medicine.notes = form.notes.data.strip()
 
+            # Get the current reminders
+            current_reminders = user_medicine.reminders
+
+            # If the number of reminders has decreased, delete the extra ones from the database
+            if len(filtered_reminders) < len(current_reminders):
+                # Remove excess reminders
+                for i in range(len(filtered_reminders), len(current_reminders)):
+                    db.session.delete(current_reminders[i])
+
             # Loop over the filtered reminder fields and update or create new reminders
             for i, (reminder_time, reminder_message, status) in enumerate(filtered_reminders):
-                if i < len(user_medicine.reminders):
-                    reminder = user_medicine.reminders[i]  # Update existing reminder
+                if i < len(current_reminders):
+                    reminder = current_reminders[i]  # Update existing reminder
                     reminder.reminder_time = reminder_time
                     reminder.reminder_message = reminder_message
                     reminder.status = status
