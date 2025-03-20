@@ -1,17 +1,23 @@
-from flask import Flask
+from flask import Flask, current_app
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
+from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.colors import HexColor
-from app.models import User, UserMedicine, Medicine
+from app.models import User, UserMedicine, Medicine, MedicationReminder
 from app.extensions import db, bcrypt
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+from twilio.rest import Client
+from datetime import datetime
+from pytz import timezone
 
 
 # Initialize extensions
@@ -21,7 +27,11 @@ login_manager = LoginManager()
 # Set the login_view to point to your login route
 login_manager.login_view = 'auth.login'
 
+# Initialize the scheduler
+scheduler = BackgroundScheduler(timezone=timezone('Australia/Brisbane'))
+
 def create_app():
+    print("Creating app...")
     # Initialize the Flask app
     app = Flask(__name__)
 
@@ -64,7 +74,90 @@ def create_app():
     app.register_blueprint(main_bp) 
     app.register_blueprint(medicines, url_prefix='/medicines') 
 
+    scheduler.add_job(
+        schedule_daily_reminders,
+        CronTrigger(hour=1, minute=0),  # Trigger at 1:00 AM every day
+        args=[app],
+    )
+    
+    # Start APScheduler
+    scheduler.start()
+
     return app
+
+
+# Job function to schedule SMS reminders for all users
+def schedule_daily_reminders(app):
+    with app.app_context():
+        # Reset the status of all reminders to 'pending'
+        db.session.query(MedicationReminder).update({MedicationReminder.status: 'pending'})
+        db.session.commit() 
+        
+        # Query all reminders for today that need to be sent
+        meds_today = db.session.query(MedicationReminder).filter(
+            MedicationReminder.reminder_time >= datetime.now().time()
+        ).all()
+        print('Schedule Jobs for today')
+        # Group reminders by their reminder time
+        reminders_by_time = {}
+        for med in meds_today:
+            reminder_time = med.reminder_time
+            if reminder_time not in reminders_by_time:
+                reminders_by_time[reminder_time] = []
+            reminders_by_time[reminder_time].append(med)
+        
+        print(reminder_time, reminders_by_time)
+
+        # For each unique reminder time, schedule an SMS job
+        for reminder_time, meds in reminders_by_time.items():
+            # Schedule a job to send the SMS for that reminder time
+            scheduler.add_job(
+                send_sms,
+                CronTrigger(hour=reminder_time.hour, minute=reminder_time.minute),  # Schedule job at reminder time
+                args=[(reminder_time, meds, app)],  # Pass reminder time and list of medications
+                id=f"send_sms_{reminder_time.hour}_{reminder_time.minute}",  # Ensure unique job ID
+                replace_existing=True  # Replace any existing jobs for the same time
+            )
+        # Print the currently scheduled jobs
+        jobs = scheduler.get_jobs()
+        for job in jobs:
+            print(f"Job ID: {job.id}, Next Run Time: {job.next_run_time}, Trigger: {job.trigger}")
+
+
+def send_sms(job_data):
+    reminder_time, meds, app = job_data
+
+    with app.app_context():
+        # Initialize Twilio client
+        twilio_client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
+        
+        message_body = "DoseTracker Reminder: "
+        for med in meds:
+            message_body += f"{med.reminder_message}\n"
+
+        user_phone_number = '+61 401 565 349'
+
+        try:
+            if message_body:
+                twilio_client.messages.create(
+                    body=message_body,
+                    from_=Config.TWILIO_PHONE_NUMBER,
+                    to=user_phone_number
+                )
+                
+            print(f"Sent reminder ({message_body}) for {reminder_time} to {user_phone_number}")
+
+            try:
+                for med in meds:
+                    med.status = 'sent'
+                    db.session.add(med) 
+                db.session.commit()  
+                print(f"Updated status to 'sent' for {len(meds)} medications.")
+            except Exception as e:
+                print(f"Error updating status: {e}")
+        
+        except Exception as e:
+            print(f"Error sending SMS for {reminder_time} to {user_phone_number}: {e}")
 
 
 def generate_pdf():
@@ -158,3 +251,7 @@ def generate_pdf():
     buffer.close()
     
     return pdf_data
+
+
+
+
