@@ -62,6 +62,7 @@ def sign_up():
         email = form.email.data
         password = form.password.data
         confirm_password = form.confirm_password.data
+        phone_number = form.phone_number.data
         
         # Check if email already exists
         existing_user = User.query.filter_by(email=email).first()
@@ -72,8 +73,12 @@ def sign_up():
         # Hash the password
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
+        # Remove leading zero from mobile number
+        if phone_number.startswith('0'):
+            phone_number = phone_number[1:]
+
         # Create new user
-        new_user = User(email=email, password_hash=hashed_password)
+        new_user = User(email=email, password_hash=hashed_password, phone_number=phone_number)
 
         # Add user to the database
         try:

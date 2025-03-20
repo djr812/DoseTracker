@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, SelectField, TimeField
-from wtforms.validators import DataRequired, Email, EqualTo, Optional, InputRequired
+from wtforms.validators import DataRequired, Email, EqualTo, Optional, InputRequired, Length
 from wtforms.fields import FieldList
 
 
@@ -13,6 +13,7 @@ class SignUpForm(FlaskForm):
     email = StringField('Email Address', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Passwords must match.")])
+    phone_number = StringField('Phone Number', validators=[InputRequired(), Length(min=10, max=15)])
 
 
 class ForgotPasswordForm(FlaskForm):

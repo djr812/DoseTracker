@@ -76,7 +76,7 @@ def create_app():
 
     scheduler.add_job(
         schedule_daily_reminders,
-        CronTrigger(hour=1, minute=0),  # Trigger at 1:00 AM every day
+        CronTrigger(hour=8, minute=31),  # Trigger at 1:00 AM every day
         args=[app],
     )
     
@@ -135,7 +135,14 @@ def send_sms(job_data):
         for med in meds:
             message_body += f"{med.reminder_message}\n"
 
-        user_phone_number = '+61 401 565 349'
+        # Retrieve the user's phone number from the database
+        user = User.query.get(meds[0].user_id)  
+        if user and user.phone_number:
+            # add +61 country code
+            user_phone_number = f"+61 {user.phone_number}"
+        else:
+            print("User phone number is missing.")
+            return
 
         try:
             if message_body:
