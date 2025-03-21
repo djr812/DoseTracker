@@ -1,7 +1,7 @@
 from flask import Flask, current_app
 from flask_migrate import Migrate
 from flask_login import LoginManager
-from flask_mail import Mail
+from flask_mail import Mail, Message
 from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
@@ -76,8 +76,8 @@ def create_app():
 
     scheduler.add_job(
         schedule_daily_reminders,
-        CronTrigger(hour=12, minute=45),  # Trigger at 1:00 AM every day
-        args=[app],
+        CronTrigger(hour=1, minute=0),  # Trigger at 1:00 AM every day
+        args=[app, mail],
     )
     
     # Start APScheduler
@@ -87,17 +87,18 @@ def create_app():
 
 
 # Job function to schedule SMS reminders for all users
-def schedule_daily_reminders(app):
+def schedule_daily_reminders(app, mail):
     with app.app_context():
         # Reset the status of all reminders to 'pending'
         db.session.query(MedicationReminder).update({MedicationReminder.status: 'pending'})
-        db.session.commit() 
-        
+        db.session.commit()
+
         # Query all reminders for today that need to be sent
         meds_today = db.session.query(MedicationReminder).filter(
             MedicationReminder.reminder_time >= datetime.now().time()
         ).all()
         print('Schedule Jobs for today')
+
         # Group reminders by their reminder time
         reminders_by_time = {}
         for med in meds_today:
@@ -105,30 +106,51 @@ def schedule_daily_reminders(app):
             if reminder_time not in reminders_by_time:
                 reminders_by_time[reminder_time] = []
             reminders_by_time[reminder_time].append(med)
-        
-        print(reminder_time, reminders_by_time)
+
+        print(reminders_by_time)
 
         # For each unique reminder time, schedule an SMS job
         for reminder_time, meds in reminders_by_time.items():
             for med in meds:
                 user = med.user
-                
                 # Skip users who opted out of SMS reminders
                 if not user.receive_sms_reminders:
                     continue
-                
+
                 # Schedule a job to send the SMS for that reminder time
                 scheduler.add_job(
                     send_sms,
                     CronTrigger(hour=reminder_time.hour, minute=reminder_time.minute),  # Schedule job at reminder time
                     args=[(reminder_time, meds, app)],  # Pass reminder time and list of medications
                     id=f"send_sms_{reminder_time.hour}_{reminder_time.minute}",  # Ensure unique job ID
+                    name=user.email,
                     replace_existing=True  # Replace any existing jobs for the same time
                 )
-        # Print the currently scheduled jobs
+
+        # Collect job information to send in an email
+        job_info = []
         jobs = scheduler.get_jobs()
         for job in jobs:
-            print(f"Job ID: {job.id}, Next Run Time: {job.next_run_time}, Trigger: {job.trigger}")
+            # Get the trigger and check if it's a CronTrigger
+            trigger = job.trigger
+            if isinstance(trigger, CronTrigger):
+                # We can directly access the expression for the hour and minute
+                # job_reminder_time = (trigger.fields[6].expr, trigger.fields[5].expr)
+
+                job_info.append(f"Name: {job.name}, Job ID: {job.id}, Next Run Time: {job.next_run_time} \n")
+
+        # Format the job information into a string
+        job_info_str = "\n".join(job_info)
+
+        # Send the job info via email
+        try:
+            msg = Message("Scheduled Daily Reminders", recipients=["dave@djrogers.net.au"])
+            msg.body = f"The following jobs were scheduled for today:\n\n{job_info_str}"
+            mail.send(msg)
+            print("Job information sent via email.")
+        except Exception as e:
+            print(f"Error sending email: {e}")
+
 
 
 def send_sms(job_data):

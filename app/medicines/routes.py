@@ -5,10 +5,14 @@ from app.application import db
 from app.forms import MedicineForm, ReminderForm, EditMedicineForm
 from datetime import time, datetime
 from wtforms import TimeField, StringField, SelectField
+import wikipediaapi
 
 
 # Define the blueprint for medicines routes
 medicines = Blueprint('medicines', __name__)
+
+# Initialise Wikipedia API
+wiki_wiki = wikipediaapi.Wikipedia(user_agent='DoseTracker (dave@djrogers.net.au)', language='en')
 
 
 @medicines.route('/api/medicines', methods=['GET'])
@@ -161,6 +165,12 @@ def my_medicine():
             'reminders': reminder_data  # Add reminders to the template data
     })
     
+    # Sort medicines by the first reminder time, then by medicine name
+    medicines.sort(key=lambda x: (
+        x['reminders'][0]['reminder_time'] if x['reminders'] else time.min,  # Use time.min for empty reminders
+        x['name']
+    ))
+
     return render_template('my_medicine.html', medicines=medicines, page_class='my_medicine_page')
 
 
@@ -286,3 +296,30 @@ def edit_medicine(medicine_id):
             print("Form validation failed. Errors:", form.errors)
 
     return render_template('edit_medicine.html', form=form, medicine=medicine, user_medicine=user_medicine, reminder_data=[])
+
+
+@medicines.route('/medicine/<int:medicine_id>', methods=['GET'])
+@login_required
+def medicine_details(medicine_id):
+    # Query the medicine from the database
+    medicine = Medicine.query.get(medicine_id)
+    if not medicine:
+        return "Medicine not found", 404
+    
+    # Use wikipedia-api to search for the medicine
+    page = wiki_wiki.page(medicine.name)
+    
+    # Check if the page exists
+    if not page.exists():
+        return "Wikipedia page not found for this medicine", 404
+    
+    # Get the sections from the Wikipedia page
+    sections = []
+    for section in page.sections:
+        sections.append({
+            'title': section.title,
+            'content': section.text[:500],  # Just show the first 500 characters initially
+            'full_content': section.text  # The full content for later expansion
+        })
+    
+    return render_template('medicine_details.html', medicine=medicine, sections=sections)

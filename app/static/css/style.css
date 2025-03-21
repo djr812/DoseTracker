@@ -234,6 +234,17 @@ button:hover {
     width: 100%; 
 }
 
+/* Add this to your style.css file */
+.medicine-name {
+    color: #6c3f6e;
+    text-decoration: none;  /* Removes the default underline of links */
+}
+
+.medicine-name:hover {
+    color: #9a65a1;  /* Slightly darker shade for hover effect */
+}
+
+
 .my_medicine_page .container {
     width: 100%;
     max-width: 1400px;
@@ -397,6 +408,43 @@ button:hover {
     text-decoration: underline;
 }
 
+/* Wiki Section Button */
+.wiki-section-button {
+    background-color: #6c3f6e; /* Button color */
+    color: white; /* Text color */
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease; /* Smooth transition on hover */
+}
+
+.wiki-section-button:hover {
+    background-color: #5a2c57; /* Darker version on hover */
+    color: white;
+}
+
+.wiki-section-button:focus {
+    outline: none; /* Remove focus outline */
+}
+
+/* Wiki Section Content */
+.wiki-section-content {
+    margin-top: 10px;
+}
+
+/* Hidden content (full content initially hidden) */
+.wiki-full-content {
+    display: none;
+}
+
+/* Additional styling for section headings */
+.wiki-section-heading {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 15px;
+}
 
 /* Footer styles */
 .footer {

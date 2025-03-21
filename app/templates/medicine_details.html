@@ -1,0 +1,77 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <h1>{{ medicine.name }} - Wikipedia</h1>
+
+        <h3>Overview</h3>
+        <p>{{ medicine.notes }}</p>
+
+        <h4>Sections:</h4>
+        <ul>
+            {% for section in sections %}
+                {% if section.content or section.full_content %}
+                    <li>
+                        <!-- Button to toggle the section with data-index attribute -->
+                        <button class="btn wiki-section-button" 
+                                data-index="{{ loop.index0 }}">
+                            {{ section.title }}
+                        </button>
+
+                        <!-- Content block for each section (initially displays preview content) -->
+                        <div id="section_{{ loop.index0 }}" class="wiki-section-content">
+                            {% if section.content %}
+                                <p id="preview-content-{{ loop.index0 }}" class="wiki-preview-content">{{ section.content }}</p>
+                            {% endif %}
+                            {% if section.full_content %}
+                                <div id="full-content-{{ loop.index0 }}" class="wiki-full-content" style="display:none;">
+                                    <p>{{ section.full_content }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        // Event listener to handle toggle
+        document.addEventListener("DOMContentLoaded", function() {
+            // Add click event to all section buttons
+            const sectionButtons = document.querySelectorAll('.wiki-section-button');
+
+            sectionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const sectionIndex = button.getAttribute('data-index'); // Get index from data-attribute
+                    toggleSection(sectionIndex); // Call toggle function
+                });
+            });
+
+            // Initialize the sections to have the preview content displayed first
+            const sectionContents = document.querySelectorAll('.wiki-section-content');
+            sectionContents.forEach(content => {
+                const previewContent = content.querySelector('.wiki-preview-content');
+                const fullContent = content.querySelector('.wiki-full-content');
+
+                fullContent.style.display = "none"; // Hide full content initially
+                previewContent.style.display = "block"; // Show preview content initially
+            });
+        });
+
+        // Toggle between preview and full content
+        function toggleSection(sectionIndex) {
+            const previewContent = document.getElementById('preview-content-' + sectionIndex);
+            const fullContent = document.getElementById('full-content-' + sectionIndex);
+
+            // Toggle visibility of preview and full content
+            if (fullContent.style.display === "none" || fullContent.style.display === "") {
+                previewContent.style.display = "none"; // Hide preview content
+                fullContent.style.display = "block"; // Show full content
+            } else {
+                previewContent.style.display = "block"; // Show preview content
+                fullContent.style.display = "none"; // Hide full content
+            }
+        }
+    </script>
+{% endblock %}
