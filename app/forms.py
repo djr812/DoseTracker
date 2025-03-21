@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, SelectField, TimeField
+from wtforms import StringField, PasswordField, TextAreaField, SelectField, TimeField, BooleanField
 from wtforms.validators import DataRequired, Email, EqualTo, Optional, InputRequired, Length
 from wtforms.fields import FieldList
 
@@ -68,7 +68,10 @@ class EditMedicineForm(FlaskForm):
     reminder_time = FieldList(TimeField('Reminder Time', format='%H:%M'), min_entries=1, max_entries=4)
     reminder_message = FieldList(StringField('Reminder Message'), min_entries=1, max_entries=4)
     
-    # Remove the FieldList for status (we'll handle it manually in the route)
+
+class UserAdminForm(FlaskForm):
+    phone_number = StringField('Phone Number', validators=[Length(max=15)])  
+    receive_sms_reminders = BooleanField('Receive SMS Medication Reminders', default=True) 
 
 
 

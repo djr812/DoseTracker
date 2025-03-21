@@ -4,7 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_mail import Message
 from flask_login import login_user, login_required, current_user, logout_user
 from app.models import User
-from app.forms import LoginForm, SignUpForm, ForgotPasswordForm, ResetPasswordForm
+from app.forms import LoginForm, SignUpForm, ForgotPasswordForm, ResetPasswordForm, UserAdminForm
 from itsdangerous import URLSafeTimedSerializer as Serializer
 from itsdangerous import SignatureExpired, BadSignature
 from urllib.parse import quote_plus, unquote_plus
@@ -74,8 +74,8 @@ def sign_up():
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
         # Remove leading zero from mobile number
-        if phone_number.startswith('0'):
-            phone_number = phone_number[1:]
+        #if phone_number.startswith('0'):
+        #    phone_number = phone_number[1:]
 
         # Create new user
         new_user = User(email=email, password_hash=hashed_password, phone_number=phone_number)
@@ -154,3 +154,30 @@ def reset_password(token):
         return redirect(url_for('auth.login'))
 
     return render_template('reset_password.html', form=form, token=token)
+
+
+@auth_bp.route('/user-admin', methods=['GET', 'POST'])
+@login_required
+def user_admin():
+    form = UserAdminForm()
+
+    # Pre-fill the form with current user data
+    if request.method == 'GET':
+        form.phone_number.data = current_user.phone_number
+        form.receive_sms_reminders.data = current_user.receive_sms_reminders
+
+    if form.validate_on_submit():
+        # Update user information
+        current_user.phone_number = form.phone_number.data
+        current_user.receive_sms_reminders = form.receive_sms_reminders.data
+
+        try:
+            db.session.commit()
+            flash('Your information has been updated!', 'success')
+            return redirect(url_for('medicines.my_medicine'))  
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error: {e}', 'error')
+            return redirect(url_for('auth.user_admin'))  # Redirect to the same page
+
+    return render_template('user_admin.html', form=form)

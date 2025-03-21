@@ -216,6 +216,16 @@ button:hover {
     color: #6c3f6e;
 }
 
+/* User Admin Styling */
+.checkbox-container {
+    display: inline-block;  
+    margin-left: 20px;      
+}
+
+.checkbox-label {
+    display: inline-block;  
+}
+
 /* Medicines Page Styling */
 .table-container {
     max-height: 500px; 

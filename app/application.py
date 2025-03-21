@@ -76,7 +76,7 @@ def create_app():
 
     scheduler.add_job(
         schedule_daily_reminders,
-        CronTrigger(hour=8, minute=31),  # Trigger at 1:00 AM every day
+        CronTrigger(hour=12, minute=45),  # Trigger at 1:00 AM every day
         args=[app],
     )
     
@@ -110,14 +110,21 @@ def schedule_daily_reminders(app):
 
         # For each unique reminder time, schedule an SMS job
         for reminder_time, meds in reminders_by_time.items():
-            # Schedule a job to send the SMS for that reminder time
-            scheduler.add_job(
-                send_sms,
-                CronTrigger(hour=reminder_time.hour, minute=reminder_time.minute),  # Schedule job at reminder time
-                args=[(reminder_time, meds, app)],  # Pass reminder time and list of medications
-                id=f"send_sms_{reminder_time.hour}_{reminder_time.minute}",  # Ensure unique job ID
-                replace_existing=True  # Replace any existing jobs for the same time
-            )
+            for med in meds:
+                user = med.user
+                
+                # Skip users who opted out of SMS reminders
+                if not user.receive_sms_reminders:
+                    continue
+                
+                # Schedule a job to send the SMS for that reminder time
+                scheduler.add_job(
+                    send_sms,
+                    CronTrigger(hour=reminder_time.hour, minute=reminder_time.minute),  # Schedule job at reminder time
+                    args=[(reminder_time, meds, app)],  # Pass reminder time and list of medications
+                    id=f"send_sms_{reminder_time.hour}_{reminder_time.minute}",  # Ensure unique job ID
+                    replace_existing=True  # Replace any existing jobs for the same time
+                )
         # Print the currently scheduled jobs
         jobs = scheduler.get_jobs()
         for job in jobs:
@@ -138,8 +145,10 @@ def send_sms(job_data):
         # Retrieve the user's phone number from the database
         user = User.query.get(meds[0].user_id)  
         if user and user.phone_number:
+            if user.phone_number.startswith('0'):
+                user_phone_number = user.phone_number[1:]
             # add +61 country code
-            user_phone_number = f"+61 {user.phone_number}"
+            user_phone_number = f"+61 {user_phone_number}"
         else:
             print("User phone number is missing.")
             return
@@ -157,7 +166,6 @@ def send_sms(job_data):
             try:
                 for med in meds:
                     med.status = 'sent'
-                    db.session.add(med) 
                 db.session.commit()  
                 print(f"Updated status to 'sent' for {len(meds)} medications.")
             except Exception as e:
