@@ -1,3 +1,23 @@
+/* 
+style.css
+----------
+
+Author:     David Rogers
+Email:      dave@djrogers.net.au
+Path:       /path/to/project/static/css/style.css
+
+Purpose:    Contains the custom styles for the Dose Tracker application. 
+            The file defines the overall layout, color schemes, typography, 
+            and styling for various pages including authentication, 
+            medicine tracking, and reminders.
+
+Dependencies: 
+    - Bootstrap
+    - Custom media queries for responsive design
+
+*/
+
+
 /* General Reset */
 * {
     margin: 0;
@@ -234,16 +254,14 @@ button:hover {
     width: 100%; 
 }
 
-/* Add this to your style.css file */
 .medicine-name {
     color: #6c3f6e;
-    text-decoration: none;  /* Removes the default underline of links */
+    text-decoration: none;  
 }
 
 .medicine-name:hover {
-    color: #9a65a1;  /* Slightly darker shade for hover effect */
+    color: #9a65a1;  
 }
-
 
 .my_medicine_page .container {
     width: 100%;
@@ -398,35 +416,35 @@ button:hover {
 }
 
 .my-medicines-list {
-    color: #9b4d96;  /* Mauve color */
+    color: #9b4d96;  
     font-weight: bold;
     text-decoration: none;
 }
 
 .my-medicines-list:hover {
-    color: #7a3c7e;  /* Darker mauve on hover */
+    color: #7a3c7e; 
     text-decoration: underline;
 }
 
 /* Wiki Section Button */
 .wiki-section-button {
-    background-color: #6c3f6e; /* Button color */
-    color: white; /* Text color */
+    background-color: #6c3f6e; 
+    color: white; 
     border: none;
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
     border-radius: 5px;
-    transition: background-color 0.3s ease; /* Smooth transition on hover */
+    transition: background-color 0.3s ease; 
 }
 
 .wiki-section-button:hover {
-    background-color: #5a2c57; /* Darker version on hover */
+    background-color: #5a2c57; 
     color: white;
 }
 
 .wiki-section-button:focus {
-    outline: none; /* Remove focus outline */
+    outline: none; 
 }
 
 /* Wiki Section Content */
@@ -542,7 +560,7 @@ button:hover {
 
     .table-container {
         max-height: 350px;  
-        overflow-y: auto;   /* Allow scrolling if needed */
+        overflow-y: auto;   
     }
 
     .my_medicine_page .container {
