@@ -77,6 +77,16 @@
         {% endblock %}
     </div>
 
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for message in messages %}
+                    <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
     <footer class="bg-dark text-white text-center py-3 mt-4">
         <p>&copy; 2025 DoseTracker. All Rights Reserved.</p>
     </footer>
@@ -100,6 +110,11 @@
         });
     </script>
     {% endif %}
+    <script>
+        setTimeout(function() {
+            document.querySelector('.flash-messages').classList.add('fade-out');
+        }, 2000);  // Hide the message after 2 seconds
+    </script>    
 </body>
 
 </html>

@@ -37,6 +37,52 @@ body {
     margin: 0;
 }
 
+/* Style for Flash Messages */
+.flash-messages {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);  /* This centers the flash message */
+    background-color: #f8d7da;  /* Light red background for error messages */
+    color: #721c24;  /* Dark red text color */
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 9999;  /* Ensure the flash message is on top */
+    width: auto;
+    min-width: 250px;
+    max-width: 600px;
+    text-align: center;
+}
+
+/* Success message */
+.flash-messages.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* Info message */
+.flash-messages.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Warning message */
+.flash-messages.warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.flash-messages.fade-out {
+    animation: fadeOut 3s forwards;
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+
 /* Navbar styles */
 .navbar {
     background-color: #4f3b61;
