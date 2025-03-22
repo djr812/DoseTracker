@@ -132,7 +132,6 @@ def schedule_daily_reminders(app, mail):
             .filter(MedicationReminder.reminder_time >= datetime.now().time())
             .all()
         )
-        print("Schedule Jobs for today")
 
         # Group reminders by their reminder time
         reminders_by_time = {}
@@ -141,8 +140,6 @@ def schedule_daily_reminders(app, mail):
             if reminder_time not in reminders_by_time:
                 reminders_by_time[reminder_time] = []
             reminders_by_time[reminder_time].append(med)
-
-        print(reminders_by_time)
 
         # For each unique reminder time, schedule an SMS job
         for reminder_time, meds in reminders_by_time.items():
