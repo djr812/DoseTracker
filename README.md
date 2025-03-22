@@ -80,45 +80,45 @@ The **Dose Tracker** is a web application built with Flask that helps users mana
 ## File Structure
 
 /dose-tracker /app /auth - routes.py 
-# Authentication-related routes (login, logout, sign-up) 
+### Authentication-related routes (login, logout, sign-up) 
 
 /main - routes.py 
-# Main application routes (medicine management, API) 
+### Main application routes (medicine management, API) 
 
 /medicines - routes.py 
-# Medicine management routes (add, delete, edit, details) 
+### Medicine management routes (add, delete, edit, details) 
 
 /templates - index.html 
-# Main landing page template 
+### Main landing page template 
 
 - sign_up.html 
-# Sign up page template 
+### Sign up page template 
 
 - add_medicine.html 
-# Add medicine page template 
+### Add medicine page template 
 
 /static /css - style.css 
-# Custom CSS styles for the app 
+### Custom CSS styles for the app 
 
 /js - app.js 
-# JavaScript for interactive features 
+### JavaScript for interactive features 
 
 /models - models.py 
-# Database models for User, Medicine, etc. 
+### Database models for User, Medicine, etc. 
 
 /forms - forms.py 
-# Forms for user input (login, sign-up, medicine forms) 
+### Forms for user input (login, sign-up, medicine forms) 
 
 /application.py 
-# Initializes Flask app, sets up extensions (SQLAlchemy, Mail) 
+### Initializes Flask app, sets up extensions (SQLAlchemy, Mail) 
 
 /migrations - (Database migrations) 
 
 /requirements.txt 
-# Required Python packages 
+### Required Python packages 
 
 - README.md 
-# Project documentation
+### Project documentation
 
 
 ## How to Use
