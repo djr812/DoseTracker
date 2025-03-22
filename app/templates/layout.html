@@ -1,3 +1,16 @@
+    <!--
+    layout.html
+    ------------
+
+    Author:     David Rogers
+    Email:      dave@djrogers.net.au
+    Path:       /path/to/project/app/templates/layout.html
+    Purpose:    Serves as the base template for all pages in the DoseTracker web application.
+                It defines the common structure (head, navbar, footer) and includes Bootstrap for responsive design.
+                Specific page content is injected into the `{% block content %}` section of child templates.
+                The layout also handles user authentication status (showing different navbar links based on login state).        
+    -->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -60,7 +73,7 @@
     <!-- Main Content Section -->
     <div class="container mt-4">
         {% block content %}
-        <!-- Content from individual pages will be injected here -->
+        <!-- Content from individual pages injected here -->
         {% endblock %}
     </div>
 

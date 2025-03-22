@@ -1,3 +1,19 @@
+<!--
+    medicine_details.html
+    ----------------------
+
+    Author:     David Rogers
+    Email:      dave@djrogers.net.au
+    Path:       /path/to/project/app/templates/medicine_details.html
+    Purpose:    Displays detailed information about a specific medicine, including its overview (notes) 
+                and associated Wikipedia content, if available. 
+                The page dynamically loads and allows users to toggle between preview and full content 
+                for different sections of the Wikipedia page.
+                If no Wikipedia page is found, a message is displayed.
+                Includes JavaScript functionality for toggling between preview and full section content.    
+-->
+
+
 {% extends 'layout.html' %}
 
 {% block content %}
@@ -6,6 +22,10 @@
 
         <h3>Overview</h3>
         <p>{{ medicine.notes }}</p>
+
+        {% if wiki_not_found %}
+            <p>Wikipedia page not found for this medicine.</p>
+        {% else %}
 
         <h4>Sections:</h4>
         <ul>
@@ -33,6 +53,7 @@
                 {% endif %}
             {% endfor %}
         </ul>
+    {% endif %}
     </div>
 
     <script>

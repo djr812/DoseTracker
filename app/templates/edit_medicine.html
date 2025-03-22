@@ -1,3 +1,18 @@
+<!--
+    edit_medicine.html
+    -------------------
+    
+    Author:     David Rogers
+    Email:      dave@djrogers.net.au
+    Path:       /path/to/project/app/templates/edit_medicine.html
+    Purpose:    Provides the user interface to edit an existing medicine record, allowing updates to 
+                details such as name, dosage, frequency, and reminder settings.    
+    Notes:      Includes dynamic JavaScript to handle the number of reminder fields based on the selected 
+                frequency. Pre-fills the form with existing data and updates the reminders accordingly.    
+    
+    Template Inheritance: Extends from `layout.html`
+-->
+
 {% extends 'layout.html' %}
 
 {% block content %}
@@ -46,19 +61,30 @@
     </form>
 </div>
 
-<!-- JavaScript for Handling Dynamic Reminder Fields -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const frequencyDropdown = document.getElementById('frequency-dropdown');
         const reminderFieldsContainer = document.getElementById('reminder-fields');
 
-        // Function to clear existing reminder fields
         function clearReminderFields() {
+            /*
+            Function:    clearReminderFields()
+            Purpose:     Clears the existing reminder input fields from the reminder fields container.
+            Parameters:  None
+            Returns:     None
+            */
             reminderFieldsContainer.innerHTML = '';
         }
 
-        // Function to add reminder fields based on the selected frequency
         function updateReminderFields() {
+            /*
+            Function:    updateReminderFields()
+            Purpose:     Dynamically updates the reminder input fields based on the selected medicine frequency.
+                        The number of reminder fields (time, message, and status) is generated based on the
+                        frequency selected (Once a Day, Twice a Day, etc.).
+            Parameters:  None
+            Returns:     None
+            */
             clearReminderFields();
 
             const frequency = frequencyDropdown.value;

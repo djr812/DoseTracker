@@ -1,3 +1,14 @@
+"""
+config.py
+----------
+
+Author:     David Rogers
+Email:      dave@djrogers.net.au
+Path:       /path/to/project/config.py
+
+Purpose:    Contains configuration settings for the Flask application, such as database URI and secret key.
+"""
+
 import os
 from dotenv import load_dotenv
 
@@ -5,7 +16,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    # Use environment variables or default values
     SECRET_KEY = os.getenv('SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')

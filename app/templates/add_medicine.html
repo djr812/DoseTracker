@@ -1,3 +1,16 @@
+<!--
+    templates/add_medicine.html
+    ----------------------------
+
+    Author:     David Rogers
+    Email:      dave@djrogers.net.au
+    Path:       /path/to/project/app/templates/add_medicine.html
+    Purpose:    Provides the HTML form for adding new medicines to the system, including fields for 
+                medicine details (name, dosage, frequency, notes) and dynamic reminder settings based 
+                on the selected frequency. The form submits data to the Flask backend to create a new 
+                medicine record and set reminders.
+-->
+
 {% extends 'layout.html' %}
 
 {% block content %}
@@ -45,7 +58,7 @@
             <h3>Reminder Settings</h3>
 
             <div id="reminder-fields" class="row">
-                <!-- Reminder fields will be dynamically added here -->
+                <!-- Reminder fields are dynamically added here -->
             </div>
 
             <!-- Add Medicine Button -->
@@ -57,6 +70,16 @@
     </div>
 
     <script type="text/javascript">
+
+        /*
+        Function:    updateReminderFields()
+        Purpose:     Dynamically updates the reminder input fields based on the selected medicine frequency.
+                     The number of reminder fields (time, message, and status) is generated based on the
+                     frequency selected (Once a Day, Twice a Day, etc.).
+        Parameters:  None
+        Returns:     None
+        */
+
         function updateReminderFields() {
             let frequency = document.getElementById('frequency').value;
             let reminderFieldsContainer = document.getElementById('reminder-fields');
@@ -114,7 +137,7 @@
             }
         }
 
-        // Initialize reminder fields when the page loads (if frequency is preselected)
+        // Initialize reminder fields when the page loads
         window.onload = function() {
             updateReminderFields();
         }

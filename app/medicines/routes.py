@@ -311,7 +311,7 @@ def medicine_details(medicine_id):
     
     # Check if the page exists
     if not page.exists():
-        return "Wikipedia page not found for this medicine", 404
+        return render_template('medicine_details.html', medicine=medicine, wiki_not_found=True)
     
     # Get the sections from the Wikipedia page
     sections = []

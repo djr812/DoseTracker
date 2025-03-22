@@ -1,3 +1,23 @@
+<!--
+    sign_up.html
+    -------------
+
+    Author:     David Rogers
+    Email:      dave@djrogers.net.au
+    Path:       /path/to/project/app/templates/sign_up.html
+
+    Purpose:    Provides a sign-up form for new users to create an account. 
+                The form includes fields for email, password, password confirmation, and an optional phone number for SMS reminders.
+    Dependencies:
+        - Utilizes Flask-WTF for form handling and CSRF protection.
+        - Assumes a Flask route that handles the sign-up logic via the `auth.sign_up` endpoint.
+        - Requires password confirmation to ensure the passwords match.
+    Notes:
+        - Includes error handling for form validation, showing error messages if the input is invalid (e.g., mismatched passwords or invalid email).
+        - The phone number field is optional and only required for users who want to receive medication reminders via SMS.
+        - This page is part of the user registration process.
+-->
+
 {% extends 'layout.html' %}
 
 {% block content %}

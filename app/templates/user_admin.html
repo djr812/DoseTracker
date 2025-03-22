@@ -1,3 +1,22 @@
+<!--
+    user_admin.html
+    ---------------
+
+    Author:     David Rogers
+    Email:      dave@djrogers.net.au
+    Path:       /path/to/project/app/templates/user_admin.html
+    Purpose:    Provides a user admin page where authenticated users can update their phone number and opt-in for SMS medication reminders. 
+                This page allows the user to manage their settings related to receiving medication reminders via SMS.
+    Dependencies:
+        - Utilizes Flask-WTF for form handling and CSRF protection.
+        - Requires a Flask route to handle the form submission for updating user information via the `auth.user_admin` endpoint.
+        - The page requires an authenticated user to access this page and update their settings.
+    Notes:
+        - The page includes validation and error handling for the phone number input.
+        - The user has the option to enable or disable SMS medication reminders via a checkbox.
+        - This page is part of the user settings management system, allowing users to configure personal preferences for medication reminders.
+-->
+
 {% extends 'layout.html' %}
 
 {% block content %}

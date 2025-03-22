@@ -1,3 +1,29 @@
+<!--
+    my_medicine.html
+    ----------------
+
+    Author:     David Rogers
+    Email:      dave@djrogers.net.au
+    Path:       /path/to/project/app/templates/my_medicine.html
+    Purpose:    Displays a list of all medicines added by the user, showing relevant information such as:
+                - Medicine Name
+                - Dosage
+                - Frequency
+                - Notes
+                - Reminder Time
+                - Reminder Status
+
+                Provides options to edit or delete each medicine. 
+                Allows the user to add new medicines and send an email with medicine data in PDF format.
+
+                Includes JavaScript functionality to:
+                - Prompt the user for their email address to send a PDF file.
+                - Validate the email address format before submission.
+    Dependencies:
+        - Requires the ability to handle CSRF tokens for form submissions (using Flask-WTF).
+        - Assumes the presence of an `/send_pdf/<email>` route for handling PDF email sending.
+-->
+
 {% extends 'layout.html' %}
 
 {% block content %}
