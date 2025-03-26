@@ -29,57 +29,59 @@
 {% block content %}
     <div class="container">
         <h1>My Medicines</h1>
-
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Medicine Name</th>
-                    <th>Dosage</th>
-                    <th>Frequency</th>
-                    <th>Notes</th>
-                    <th>Reminder Time</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for medicine in medicines %}
+        
+        <div class="table-container">
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>
-                            <a href="{{ url_for('medicines.medicine_details', medicine_id=medicine.id) }}" class="medicine-name">
-                                {{ medicine.name }}
-                            </a>
-                        </td>
-                        <td>{{ medicine.dosage }}</td>
-                        <td>{{ medicine.frequency }}</td>
-                        <td>{{ medicine.notes }}</td>
-                        <td>
-                            {% for reminder in medicine.reminders %}
-                                <div>
-                                    <strong>Reminder:</strong> {{ reminder.reminder_time.strftime('%H:%M') }} 
-                                </div>
-                            {% endfor %}
-                        </td>
-                        <td id="status-{{ medicine.id }}">
-                            {% for reminder in medicine.reminders %}
-                                <div>
-                                    <strong>Status:</strong> {{ reminder.status }}
-                                </div>
-                            {% endfor %}
-                        </td>
-                        <td>
-                            <a href="{{ url_for('medicines.edit_medicine', medicine_id=medicine.id) }}" class="btn btn-primary mr-2">Edit</a>
-
-                            <form action="{{ url_for('medicines.delete_medicine', medicine_id=medicine.id) }}" method="POST" style="display:inline;">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> 
-                                <input type="hidden" name="_method" value="DELETE">
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this medicine?');">Delete</button>
-                            </form>
-                        </td>
+                        <th>Medicine Name</th>
+                        <th>Dosage</th>
+                        <th>Frequency</th>
+                        <th>Notes</th>
+                        <th>Reminder Time</th>
+                        <th>Status</th>
+                        <th>Action</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="scrollable-body">
+                    {% for medicine in medicines %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('medicines.medicine_details', medicine_id=medicine.id) }}" class="medicine-name">
+                                    {{ medicine.name }}
+                                </a>
+                            </td>
+                            <td>{{ medicine.dosage }}</td>
+                            <td>{{ medicine.frequency }}</td>
+                            <td>{{ medicine.notes }}</td>
+                            <td>
+                                {% for reminder in medicine.reminders %}
+                                    <div>
+                                        <strong>Reminder:</strong> {{ reminder.reminder_time.strftime('%H:%M') }} 
+                                    </div>
+                                {% endfor %}
+                            </td>
+                            <td id="status-{{ medicine.id }}">
+                                {% for reminder in medicine.reminders %}
+                                    <div>
+                                        <strong>Status:</strong> {{ reminder.status }}
+                                    </div>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('medicines.edit_medicine', medicine_id=medicine.id) }}" class="btn btn-primary mr-2">Edit</a>
+
+                                <form action="{{ url_for('medicines.delete_medicine', medicine_id=medicine.id) }}" method="POST" style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> 
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this medicine?');">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
         <div class="d-flex justify-content-start mt-3">
             <a href="{{ url_for('medicines.add_medicine') }}" class="btn btn-primary mr-2">Add New Medicine</a>
@@ -140,5 +142,16 @@
     };
 </script>
 
+<style>
+    /* Add scrollable functionality to the table container */
+    .table-container {
+            max-height: 600px;  
+            overflow-y: auto;
+    }
+
+    table th, table td {
+            white-space: nowrap;
+    }
+</style>
 
 {% endblock %}
