@@ -20,13 +20,19 @@ Routes:
     - /medicine/<medicine_id>: Fetches and displays detailed information about a medicine, including content from Wikipedia.
 """
 
-from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, current_app
 from flask_login import login_required, current_user
-from app.models import Medicine, UserMedicine, MedicationReminder
-from app.application import db
+from config import Config
+from app.models import Medicine, UserMedicine, MedicationReminder, User
+from app.application import scheduler, mail, create_app
+from app.extensions import db
 from app.forms import MedicineForm, ReminderForm, EditMedicineForm
 from datetime import time, datetime
+from flask_mail import Mail, Message
+from twilio.rest import Client
 from wtforms import TimeField, StringField, SelectField
+from apscheduler.triggers.cron import CronTrigger
+from datetime import datetime
 import wikipediaapi
 
 
@@ -154,6 +160,11 @@ def add_medicine():
 
         try:
             db.session.commit()
+            
+            # Schedule the daily reminders after the medicine is added
+            # update_reminders()
+
+            # Advise user
             flash("Medicine and reminder added successfully!", "success")
             return redirect(url_for("medicines.my_medicine"))
         except Exception as e:
@@ -268,6 +279,11 @@ def delete_medicine(medicine_id):
         # Delete the user_medicine record
         db.session.delete(user_medicine)
         db.session.commit()
+
+        # Schedule the daily reminders after deleting
+        # update_reminders()
+
+        # Advise user
         flash("Medicine deleted successfully!", "success")
         return redirect(url_for("medicines.my_medicine"))
     else:
@@ -396,12 +412,17 @@ def edit_medicine(medicine_id):
             # Commit changes to the database
             try:
                 db.session.commit()
+
+                # Schedule the daily reminders after editing
+                # update_reminders()
+
+                # Advise user
                 flash("Changes saved successfully!", "success")
                 return redirect(url_for("medicines.my_medicine"))
             except Exception as e:
                 db.session.rollback()
                 flash("Update failed. Please try again.", "error")
-                print(f"Error: {e}")
+                print(f"Error Editing Medication: {e}")
         else:
             flash("Form validation failed", "error")
             print("Form validation failed. Errors:", form.errors)
@@ -458,3 +479,26 @@ def medicine_details(medicine_id):
     return render_template(
         "medicine_details.html", medicine=medicine, sections=sections
     )
+
+
+@medicines.route('/update_medicine', methods=['GET'])
+def update_medicine():
+    # Get the current user's medicines
+    user_medicines = UserMedicine.query.filter_by(user_id=current_user.id).all()
+    
+    # Initialize an empty list to store response data
+    response_data = []
+    
+    for user_medicine in user_medicines:
+        # Get the reminders for this user-medicine combination
+        reminders = MedicationReminder.query.filter_by(user_medicine_id=user_medicine.id).all()
+        
+        for reminder in reminders:
+            # Append the relevant information to the response_data list
+            response_data.append({
+                'id': user_medicine.medicine_id,  # This is the medicine ID, tied to the user-medicine record
+                'name': user_medicine.medicine.name,  # Accessing the medicine's name
+                'status': reminder.status  # The status of the reminder
+            })
+    
+    return jsonify(response_data)

@@ -60,7 +60,7 @@
                                 </div>
                             {% endfor %}
                         </td>
-                        <td>
+                        <td id="status-{{ medicine.id }}">
                             {% for reminder in medicine.reminders %}
                                 <div>
                                     <strong>Status:</strong> {{ reminder.status }}
@@ -87,7 +87,44 @@
         </div>
     </div>
 
-<script>
+    <script>
+        // Function to update the status of medicines dynamically
+    function updateMedicineList() {
+        // Send an AJAX request to the server to get updated medicine status
+        $.ajax({
+            url: '/medicines/update_medicine',  // Ensure this route returns updated medicine data
+            method: 'GET',
+            success: function(data) {
+                // Iterate over the returned data (medicine status)
+                data.forEach(function(medicine) {
+                    // Update the status in the table row
+                    let statusCell = document.getElementById('status-' + medicine.id);
+                    if (statusCell) {  // Ensure the element exists before trying to update it
+                        statusCell.innerHTML = `
+                            <div>
+                                <strong>Status:</strong> ${medicine.status}
+                            </div>
+                        `;
+                    } else {
+                        console.error("Status cell not found for medicine with ID: " + medicine.id);
+                    }
+                });
+            },
+            error: function(error) {
+                console.error('Error fetching medicine data:', error);
+            }
+        });
+    }
+    
+
+        // Update the medicine list every 30 seconds
+        setInterval(updateMedicineList, 10000);
+    
+
+        // Initial load of the medicine list
+        updateMedicineList();
+
+
     function sendEmail() {
         // Ask the user for their email address using a prompt
         let userEmail = prompt("Please enter your email address:");
@@ -102,5 +139,6 @@
         }
     };
 </script>
+
 
 {% endblock %}

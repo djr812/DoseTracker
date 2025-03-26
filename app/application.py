@@ -10,7 +10,7 @@ Purpose:    Initializes and configures the Flask application, including setting 
             database models, routes, and scheduled tasks like daily medication reminders and SMS alerts.
 """
 
-from flask import Flask, current_app
+from flask import Flask, current_app, render_template
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_mail import Mail, Message
@@ -27,8 +27,10 @@ from app.models import User, UserMedicine, Medicine, MedicationReminder
 from app.extensions import db, bcrypt
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.interval import IntervalTrigger
 from twilio.rest import Client
-from datetime import datetime
+from datetime import datetime, timedelta
+import time
 from pytz import timezone
 
 
@@ -41,6 +43,9 @@ login_manager.login_view = "auth.login"
 
 # Initialize the scheduler
 scheduler = BackgroundScheduler(timezone=timezone("Australia/Brisbane"))
+
+# Initialise Mail
+mail = Mail()
 
 
 def create_app():
@@ -67,14 +72,12 @@ def create_app():
     app.config["MAIL_PASSWORD"] = Config.MAIL_SERVER_PASS
     app.config["MAIL_DEFAULT_SENDER"] = "dave@djrogers.net.au"
 
-    # Initialise Mail
-    mail = Mail(app)
-
     # Initialise extensions
     db.init_app(app)
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
+    mail.init_app(app)
 
     # Import models and routes after extensions are initialized
     with app.app_context():
@@ -99,7 +102,7 @@ def create_app():
     # Create daily job-creation job
     scheduler.add_job(
         schedule_daily_reminders,
-        CronTrigger(hour=1, minute=0),  # Trigger at 1:00 AM every day
+        IntervalTrigger(minutes=1),  # Trigger each minute
         args=[app, mail],
     )
 
@@ -120,13 +123,23 @@ def schedule_daily_reminders(app, mail):
     """
 
     with app.app_context():
-        # Reset the status of all reminders to 'pending'
-        db.session.query(MedicationReminder).update(
-            {MedicationReminder.status: "pending"}
-        )
-        db.session.commit()
+        # When this job runs at 1am reset all reminders to 'pending' and send out info email
+        target_hour=1
+        target_minute=0
+        current_time = datetime.now()
+        target_time = current_time.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
+        time_window_start = target_time - timedelta(seconds=30)
+        time_window_end = target_time + timedelta(seconds=30)
+        
+        if time_window_start <= current_time <= time_window_end:
+            # Reset the status of all reminders to 'pending'
+            db.session.query(MedicationReminder).update(
+                {MedicationReminder.status: "Pending"}
+            )
+            db.session.commit()
+            print("All jobs set to pending")
 
-        # Query all reminders for today that need to be sent
+        # Query all reminders for rest of today that need to be sent
         meds_today = (
             db.session.query(MedicationReminder)
             .filter(MedicationReminder.reminder_time >= datetime.now().time())
@@ -150,7 +163,7 @@ def schedule_daily_reminders(app, mail):
                     continue
 
                 # Schedule a job to send the SMS for that reminder time
-                scheduler.add_job(
+                job = scheduler.add_job(
                     send_sms,
                     CronTrigger(hour=reminder_time.hour, minute=reminder_time.minute),
                     args=[(reminder_time, meds, app)],
@@ -158,30 +171,33 @@ def schedule_daily_reminders(app, mail):
                     name=user.email,
                     replace_existing=True,
                 )
+                # print(f"Created Job {job.id} for {job.name} - It will run at {job.next_run_time}")
 
-        # Collect job information to send in an email
-        job_info = []
-        jobs = scheduler.get_jobs()
-        for job in jobs:
-            trigger = job.trigger
-            if isinstance(trigger, CronTrigger):
-                job_info.append(
-                    f"Name: {job.name}, Job ID: {job.id}, Next Run Time: {job.next_run_time} \n"
+        # When run at 1:00am send an email with what has been scheduled
+        if time_window_start <= current_time <= time_window_end:
+            # Collect job information to send in an email
+            job_info = []
+            jobs = scheduler.get_jobs()
+            for job in jobs:
+                trigger = job.trigger
+                if isinstance(trigger, CronTrigger):
+                    job_info.append(
+                        f"Name: {job.name}, Job ID: {job.id}, Next Run Time: {job.next_run_time} \n"
+                    )
+
+            # Format the job information into a string
+            job_info_str = "\n".join(job_info)
+
+            # Send the job info via email
+            try:
+                msg = Message(
+                    "Scheduled Daily Reminders", recipients=["dave@djrogers.net.au"]
                 )
-
-        # Format the job information into a string
-        job_info_str = "\n".join(job_info)
-
-        # Send the job info via email
-        try:
-            msg = Message(
-                "Scheduled Daily Reminders", recipients=["dave@djrogers.net.au"]
-            )
-            msg.body = f"The following jobs were scheduled for today:\n\n{job_info_str}"
-            mail.send(msg)
-            print("Job information sent via email.")
-        except Exception as e:
-            print(f"Error sending email: {e}")
+                msg.body = f"The following jobs were scheduled for today:\n\n{job_info_str}"
+                mail.send(msg)
+                print("Job information sent via email.")
+            except Exception as e:
+                print(f"Error sending email: {e}")
 
 
 def send_sms(job_data):
@@ -223,16 +239,17 @@ def send_sms(job_data):
                     to=user_phone_number,
                 )
 
-            print(
-                f"Sent reminder ({message_body}) for {reminder_time} to {user_phone_number}"
-            )
+            print(f"Sent reminder ({message_body}) for {reminder_time} to {user_phone_number}")
 
             # Set the medication status to 'sent'
             try:
                 for med in meds:
+                    med = db.session.merge(med)
                     med.status = "sent"
+                db.session.flush()
                 db.session.commit()
                 print(f"Updated status to 'sent' for {len(meds)} medications.")
+                
             except Exception as e:
                 print(f"Error updating status: {e}")
 
