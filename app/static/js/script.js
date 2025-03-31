@@ -1,3 +1,7 @@
+import config from './config.js';
+
+// Make config available globally
+window.config = config;
 
 // Wait for the DOM to fully load before running the script
 document.addEventListener('DOMContentLoaded', function () {
@@ -34,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // Function to handle deleting a medicine
 function deleteMedicine(medicineId) {
     if (confirm("Are you sure you want to delete this medicine?")) {
-        fetch(`/delete_medicine/${medicineId}`, {
+        fetch(`${config.DT_SERVER_URL}delete_medicine/${medicineId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

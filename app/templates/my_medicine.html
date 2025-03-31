@@ -89,12 +89,16 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+    import config from '../static/js/config.js';
+
+    // Make config available globally
+    window.config = config;
         // Function to update the status of medicines dynamically
     function updateMedicineList() {
         // Send an AJAX request to the server to get updated medicine status
         $.ajax({
-            url: '/medicines/update_medicine',  // Ensure this route returns updated medicine data
+            url: `${config.DT_SERVER_URL}medicines/update_medicine`,  // Ensure this route returns updated medicine data
             method: 'GET',
             success: function(data) {
                 // Iterate over the returned data (medicine status)
