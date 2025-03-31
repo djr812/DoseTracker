@@ -278,7 +278,7 @@ def generate_pdf():
     c.rect(0, title_height, 600, 80, fill=1)
 
     # Add the logo
-    logo_path = "app/static/img/logo.png"
+    logo_path = Config.DT_SERVER_LOGO_PATH + "app/static/img/logo.png"
     c.drawImage(logo_path, 30, title_height + 10, width=55, height=50)
 
     # Set title text colour to white for contrast

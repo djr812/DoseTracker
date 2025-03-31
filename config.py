@@ -23,3 +23,5 @@ class Config:
     TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')
     TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
     TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+    DT_SERVER_URL = os.getenv('DT_SERVER_URL')
+    DT_SERVER_LOGO_PATH = os.getenv('DT_SERVER_LOGO_PATH')
