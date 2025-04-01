@@ -149,12 +149,53 @@
 <style>
     /* Add scrollable functionality to the table container */
     .table-container {
-            max-height: 600px;  
-            overflow-y: auto;
+            max-height: 375px !important;  
+            overflow-y: scroll !important; /* Force scrollbar to always show */
+            scrollbar-width: auto !important; /* For Firefox */
+            -ms-overflow-style: scrollbar !important; /* For Internet Explorer and Edge */
+            border: 1px solid #ddd !important; /* Add border to make container more visible */
+            position: relative !important;
+    }
+
+    /* Force table to fill container and enable scroll */
+    .table-container .table {
+            margin-bottom: 0 !important;
+            width: 100% !important;
+    }
+
+    /* WebKit browsers (Chrome, Safari, etc.) */
+    .table-container::-webkit-scrollbar {
+            display: block !important;
+            width: 12px !important; /* Slightly wider scrollbar */
+            height: 12px !important;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1 !important;
+            border-radius: 5px !important;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+            background: #666 !important; /* Darker color for better visibility */
+            border-radius: 5px !important;
+            border: 2px solid #f1f1f1 !important;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+            background: #555 !important;
     }
 
     table th, table td {
-            white-space: nowrap;
+            white-space: nowrap !important;
+    }
+
+    /* Ensure Bootstrap doesn't interfere with overflow */
+    body.modal-open {
+            overflow: auto !important;
+    }
+
+    .scrollable-body {
+            overflow: visible !important;
     }
 </style>
 
