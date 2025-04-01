@@ -114,8 +114,12 @@
     </script>
     {% endif %}
     <script>
+        // Add fade-out animation to flash messages if they exist
         setTimeout(function() {
-            document.querySelector('.flash-messages').classList.add('fade-out');
+            const flashMessages = document.querySelector('.flash-messages');
+            if (flashMessages) {
+                flashMessages.classList.add('fade-out');
+            }
         }, 2000);  // Hide the message after 2 seconds
     </script>    
 </body>
