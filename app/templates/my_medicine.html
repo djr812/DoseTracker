@@ -96,9 +96,25 @@
     window.config = config;
         // Function to update the status of medicines dynamically
     function updateMedicineList() {
+        // Get the server URL from the meta tag
+        const serverUrlMeta = document.getElementById('dt-server-url');
+        let baseUrl = serverUrlMeta ? serverUrlMeta.getAttribute('data-url') : '/';
+        
+        // If baseUrl is "None" (as a string) or not set, default to '/'
+        if (!baseUrl || baseUrl === "None" || baseUrl === "null") {
+            baseUrl = '/';
+        }
+        
+        // Build the complete URL, handling trailing slashes correctly
+        const url = baseUrl.endsWith('/') ? 
+            `${baseUrl}medicines/update_medicine` : 
+            `${baseUrl}/medicines/update_medicine`;
+        
+        console.log("Making request to URL:", url);
+        
         // Send an AJAX request to the server to get updated medicine status
         $.ajax({
-            url: `${config.DT_SERVER_URL}medicines/update_medicine`,  // Ensure this route returns updated medicine data
+            url: url,  // Use the properly formatted URL
             method: 'GET',
             success: function(data) {
                 // Iterate over the returned data (medicine status)

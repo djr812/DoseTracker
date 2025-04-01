@@ -22,6 +22,8 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+    <!-- Pass server URL to JavaScript via data attribute -->
+    <meta id="dt-server-url" data-url="{{ config.DT_SERVER_URL or '/' }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
